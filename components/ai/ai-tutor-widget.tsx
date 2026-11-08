@@ -91,12 +91,19 @@ export function AiTutorWidget() {
         }),
       });
 
-      const data = await response.json();
+      let replyContent = '';
+      try {
+        const data = await response.json();
+        replyContent = data.reply;
+      } catch {
+        replyContent = '⏳ Máy chủ AI đang xử lý lượt truy cập cao trong giây lát. Em bấm gửi lại câu hỏi sau vài giây nhé!';
+      }
+
       const assistantMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         role: 'assistant',
         content:
-          data.reply ||
+          replyContent ||
           'Xin lỗi bạn, mình chưa thể trả lời câu hỏi này lúc này. Bạn thử lại nhé!',
         timestamp: new Date().toLocaleTimeString('vi-VN', {
           hour: '2-digit',
@@ -112,7 +119,7 @@ export function AiTutorWidget() {
         {
           id: `ai-err-${Date.now()}`,
           role: 'assistant',
-          content: '⚠️ Có lỗi kết nối tới máy chủ AI. Bạn vui lòng kiểm tra lại kết nối mạng nhé!',
+          content: '⏳ Máy chủ AI đang nhận lượng truy cập cao trong giây lát. Em bấm gửi lại câu hỏi sau 5 - 10 giây nhé!',
           timestamp: 'Vừa xong',
         },
       ]);

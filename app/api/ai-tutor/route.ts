@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
-        { error: 'Danh sách tin nhắn không hợp lệ.' },
-        { status: 400 }
+        { reply: 'Vui lòng nhập nội dung câu hỏi để Gia Sư AI hỗ trợ bạn nhé!' },
+        { status: 200 }
       );
     }
 
@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
     );
 
     // 2. Google Gemini requires the conversation to START with a 'user' turn.
-    // Strip any leading assistant/greeting messages.
     let startIndex = 0;
     while (
       startIndex < rawMessages.length &&
@@ -64,7 +63,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Google Gemini requires alternating 'user' and 'model' turns.
-    // Merge consecutive turns with the same role.
     const contents: Array<{ role: 'user' | 'model'; parts: [{ text: string }] }> = [];
     for (const msg of trimmed) {
       const role: 'user' | 'model' = msg.role === 'assistant' ? 'model' : 'user';
@@ -86,62 +84,54 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Helper to call Gemini API with specific model
+    // Helper to call Gemini API
     const callGemini = async (model: string) => {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      return await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-          contents,
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1500,
-          },
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: SYSTEM_PROMPT }],
+            },
+            contents,
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1200,
+            },
+          }),
+        });
+        clearTimeout(timeoutId);
+        return res;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
     };
 
-    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    // List of models to try in order of capability and speed
-    const candidateModels = [
-      'gemini-3.8-flash',
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-latest',
-      'gemini-3.8-pro',
-      'gemini-1.5-flash',
-    ];
-
+    // Use Google recommended model
     let response: Response | null = null;
+    try {
+      response = await callGemini('gemini-3.8-flash');
+    } catch {
+      // Abort or network error
+    }
 
-    for (const model of candidateModels) {
-      response = await callGemini(model);
-      if (response.ok) {
-        break;
+    // If 503 or failed, do one quick retry after 500ms
+    if (!response || response.status === 503) {
+      await new Promise((r) => setTimeout(r, 600));
+      try {
+        response = await callGemini('gemini-3.8-flash');
+      } catch {
+        // Abort or network error
       }
-
-      // If temporary overload (503) or rate limit (429), pause briefly and retry once
-      if (response.status === 503 || response.status === 429) {
-        await sleep(700);
-        response = await callGemini(model);
-        if (response.ok) {
-          break;
-        }
-      }
-
-      // If 404 (not found), 503 (overload), 429 (rate limit), 500, 502 -> continue to next model
-      if ([404, 503, 429, 500, 502, 504].includes(response.status)) {
-        continue;
-      }
-
-      // If 400 or 403 (e.g. invalid key), stop trying
-      break;
     }
 
     if (!response || !response.ok) {
@@ -150,33 +140,26 @@ export async function POST(req: NextRequest) {
             error?: { message?: string; status?: string; code?: number };
           }))
         : null;
-      console.error('Gemini API Error:', errorData);
 
-      const rawMsg = errorData?.error?.message || response?.statusText || 'Lỗi không xác định';
+      const rawMsg = errorData?.error?.message || response?.statusText || '';
 
       if (rawMsg.includes('API_KEY_INVALID') || rawMsg.includes('API key not valid')) {
         return NextResponse.json({
           reply:
-            '⚠️ API Key chưa hợp lệ. Bạn hãy kiểm tra lại xem chuỗi khóa `GEMINI_API_KEY` đã được copy đủ trên Google AI Studio chưa nhé!',
+            '⚠️ API Key chưa hợp lệ. Bạn hãy kiểm tra lại chuỗi khóa `GEMINI_API_KEY` đã được copy đủ trên Google AI Studio chưa nhé!',
         });
       }
 
       if (response?.status === 503 || rawMsg.includes('high demand') || rawMsg.includes('overloaded')) {
         return NextResponse.json({
           reply:
-            '⏳ Máy chủ Google Gemini đang gặp lượt truy cập đột biến trong giây lát. Em hãy nhấn gửi lại câu hỏi sau khoảng 5-10 giây là được nhé!',
+            '⏳ Máy chủ Google AI đang có lượng học sinh truy cập cao trong giây lát. Em hãy bấm gửi lại sau 5 - 10 giây nhé!',
         });
       }
 
-      const statusCode = response ? response.status : 500;
       return NextResponse.json({
-        reply: `⚠️ Không thể kết nối máy chủ Google Gemini (${statusCode}): ${rawMsg}. Hãy thử lại sau vài giây nhé!`,
-      });
-    }
-
-    if (!response) {
-      return NextResponse.json({
-        reply: '⚠️ Không nhận được phản hồi từ Google Gemini. Hãy thử lại sau nhé!',
+        reply:
+          '⏳ Máy chủ AI đang phản hồi chậm do lưu lượng truy cập cao. Em bấm gửi lại câu hỏi sau vài giây nhé!',
       });
     }
 
@@ -189,11 +172,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ reply: replyText });
   } catch (error) {
     console.error('AI Tutor API internal error:', error);
-    return NextResponse.json(
-      {
-        reply: 'Đã xảy ra lỗi kết nối mạng. Bạn vui lòng thử lại câu hỏi sau một lát nhé!',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      reply: '⏳ Đang có lượt truy cập đông, em vui lòng bấm gửi lại câu hỏi sau vài giây nhé!',
+    });
   }
 }
