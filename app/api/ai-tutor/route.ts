@@ -107,20 +107,39 @@ export async function POST(req: NextRequest) {
       });
     };
 
-    // Try gemini-1.5-flash first, fallback to gemini-2.0-flash if needed
-    let response = await callGemini('gemini-1.5-flash');
+    // List of models to try in order of Google AI recommendation
+    const candidateModels = [
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-1.5-flash',
+      'gemini-2.0-flash',
+    ];
 
-    if (!response.ok && response.status === 404) {
-      response = await callGemini('gemini-2.0-flash');
+    let response: Response | null = null;
+    let lastErrorData: { error?: { message?: string; status?: string; code?: number } } | null = null;
+
+    for (const model of candidateModels) {
+      response = await callGemini(model);
+      if (response.ok) {
+        break;
+      }
+      // If 404 (model deprecated or not available), try next candidate
+      if (response.status === 404) {
+        continue;
+      }
+      // If not 404 (e.g. invalid key, quota, etc.), stop and handle error
+      break;
     }
 
-    if (!response.ok) {
-      const errorData = (await response.json().catch(() => ({}))) as {
-        error?: { message?: string; status?: string; code?: number };
-      };
+    if (!response || !response.ok) {
+      const errorData = response
+        ? (((await response.json().catch(() => ({}))) as {
+            error?: { message?: string; status?: string; code?: number };
+          }))
+        : null;
       console.error('Gemini API Error:', errorData);
 
-      const rawMsg = errorData?.error?.message || response.statusText || 'Lỗi không xác định';
+      const rawMsg = errorData?.error?.message || response?.statusText || 'Lỗi không xác định';
 
       if (rawMsg.includes('API_KEY_INVALID') || rawMsg.includes('API key not valid')) {
         return NextResponse.json({
@@ -129,8 +148,15 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      const statusCode = response ? response.status : 500;
       return NextResponse.json({
-        reply: `⚠️ Không thể kết nối máy chủ Google Gemini (${response.status}): ${rawMsg}. Hãy thử lại sau vài giây nhé!`,
+        reply: `⚠️ Không thể kết nối máy chủ Google Gemini (${statusCode}): ${rawMsg}. Hãy thử lại sau vài giây nhé!`,
+      });
+    }
+
+    if (!response) {
+      return NextResponse.json({
+        reply: '⚠️ Không nhận được phản hồi từ Google Gemini. Hãy thử lại sau nhé!',
       });
     }
 
