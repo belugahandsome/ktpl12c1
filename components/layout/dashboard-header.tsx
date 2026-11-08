@@ -64,7 +64,7 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
         </button>
 
         <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
-          <span>Kỳ thi Tốt nghiệp THPT 2025</span>
+          <span>Kỳ thi Tốt nghiệp THPT 2027</span>
           <span className="text-slate-300">•</span>
           <span className="text-indigo-600 font-bold">Môn Tiếng Anh</span>
         </div>

@@ -1780,7 +1780,7 @@ export const INITIAL_MOCK_EXAMS: MockExam[] = [
     code: 'MÃ ĐỀ 101',
     title: 'Đề Thi Thử Tốt Nghiệp THPT Chuẩn Cấu Trúc - Đề Số 01',
     description: 'Đề thi thử chuẩn cấu trúc và ma trận phân bổ câu hỏi của Bộ Giáo dục và Đào tạo, bao gồm phát âm, trọng âm, ngữ pháp, từ vựng, giao tiếp, câu đồng nghĩa, đọc hiểu và điền khuyết.',
-    year: 2025,
+    year: 2027,
     duration_minutes: 50,
     total_questions: 15,
     questions: INITIAL_EXAM_QUESTIONS.slice(0, 15),
@@ -1790,7 +1790,7 @@ export const INITIAL_MOCK_EXAMS: MockExam[] = [
     code: 'MÃ ĐỀ 102',
     title: 'Đề Luyện Thi Chuyên Sâu Điểm 8+ & 9+ - Đề Số 02',
     description: 'Tập trung vào các bẫy phân loại học sinh: mệnh đề quan hệ rút gọn, đảo ngữ câu điều kiện, thành ngữ cố định (idioms & collocations) và đọc hiểu nâng cao.',
-    year: 2025,
+    year: 2027,
     duration_minutes: 45,
     total_questions: 12,
     questions: [

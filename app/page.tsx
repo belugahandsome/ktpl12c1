@@ -66,7 +66,7 @@ const FEATURES = [
     iconColor: 'text-emerald-600',
     title: 'Đề Thi Thử Chuẩn Format BGD',
     desc: 'Đề thi 50 câu chuẩn 60 phút, chấm điểm tự động và có lời giải song ngữ chi tiết từng phương án A, B, C, D.',
-    badge: 'Chuẩn BGD 2025',
+    badge: 'Chuẩn BGD 2027',
   },
   {
     icon: Video,
@@ -146,7 +146,7 @@ export default function LandingPage() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-indigo-200/80 shadow-xs animate-fade-in">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                 <span className="text-xs font-bold text-indigo-700">
-                  Luyện Thi THPT Quốc Gia Chuẩn Cấu Trúc 2025
+                  Luyện Thi THPT Quốc Gia Chuẩn Cấu Trúc 2027
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-indigo-400" />
               </div>

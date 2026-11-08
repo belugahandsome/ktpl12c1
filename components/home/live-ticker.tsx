@@ -7,7 +7,7 @@ const TICKER_ITEMS = [
   {
     icon: Flame,
     color: 'text-amber-500',
-    text: 'Sĩ tử 2007: Hơn 15.200 học sinh đang ôn luyện chuẩn bị THPT Quốc Gia 2025!',
+    text: 'Sĩ tử 2009: Hơn 15.200 học sinh đang ôn luyện chuẩn bị THPT Quốc Gia 2027!',
   },
   {
     icon: Trophy,
@@ -22,7 +22,7 @@ const TICKER_ITEMS = [
   {
     icon: Clock,
     color: 'text-rose-500',
-    text: 'Kỳ thi Tốt nghiệp THPT 2025: Lộ trình 30 ngày phá đảo ngữ pháp điểm liệt & bứt phá điểm 8+',
+    text: 'Kỳ thi Tốt nghiệp THPT 2027: Lộ trình 30 ngày phá đảo ngữ pháp điểm liệt & bứt phá điểm 8+',
   },
   {
     icon: TrendingUp,

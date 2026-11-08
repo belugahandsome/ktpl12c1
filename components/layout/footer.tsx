@@ -100,7 +100,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2025 - 2026 ENGLISH HUB. Bản quyền thuộc về nền tảng.</p>
+          <p>© 2025 - 2027 ENGLISH HUB. Bản quyền thuộc về nền tảng.</p>
           <p className="flex items-center gap-1">
             Thiết kế vì sự tiến bộ của học sinh Việt Nam <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
           </p>

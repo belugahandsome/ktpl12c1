@@ -64,7 +64,7 @@ const SHORT_LESSONS: ShortLesson[] = [
   },
   {
     id: 'lesson-3',
-    title: 'Top 5 Cụm Collocations "Ăn Điểm" Hay Gặp Nhất 2025',
+    title: 'Top 5 Cụm Collocations "Ăn Điểm" Hay Gặp Nhất 2027',
     subject: 'Từ Vựng & Cụm Từ',
     duration: '0:50',
     views: '31.2K',
