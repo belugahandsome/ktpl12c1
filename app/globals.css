@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #F8FAFC;
+    --surface: #FFFFFF;
+    --primary: #4F46E5;
+    --primary-hover: #4338CA;
+    --secondary: #3B82F6;
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --success: #10B981;
+    --error: #EF4444;
+    --warning: #F59E0B;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-main);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* 3D Flashcard flip animation */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
