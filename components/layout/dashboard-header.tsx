@@ -34,12 +34,17 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
 
   const handleLogout = async () => {
     if (isSupabaseConfigured()) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {}
     }
-    // Clear demo mode cookie
+    // Clear cookies & storage
     document.cookie = 'eh_demo_mode=; path=/; max-age=0';
+    document.cookie = 'eh_auth_session=; path=/; max-age=0';
     localStorage.removeItem('eh_active_user');
+    localStorage.removeItem('eh_user_progress');
+    localStorage.removeItem('eh_quiz_attempts');
     router.push('/login');
   };
 
@@ -66,13 +71,13 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
         {/* Streak counter */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-xs font-bold shadow-xs">
           <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
-          <span>{progress?.streak_days || 7} Ngày Streak</span>
+          <span>{progress?.streak_days !== undefined ? progress.streak_days : 1} Ngày Streak</span>
         </div>
 
         {/* Target score pill */}
         <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/70 text-indigo-700 text-xs font-bold">
           <Target className="w-3.5 h-3.5 text-indigo-600" />
-          <span>Mục tiêu: {user?.target_score?.toFixed(1) || '8.5'}đ</span>
+          <span>Mục tiêu: {user?.target_score ? user.target_score.toFixed(1) : '8.0'}đ</span>
         </div>
 
         {/* User profile dropdown */}

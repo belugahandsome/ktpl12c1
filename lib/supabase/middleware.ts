@@ -11,34 +11,42 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
+  // Check auth indicators from cookies
+  const isDemoMode = request.cookies.get('eh_demo_mode')?.value === '1';
+  const hasAuthSession = request.cookies.get('eh_auth_session')?.value === '1';
+  const hasSupabaseCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+
   // If Supabase credentials are not yet set, skip authentication check
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
     return supabaseResponse;
   }
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+  let user = null;
+  try {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        supabaseResponse = NextResponse.next({
-          request,
-        });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Allow demo mode: if cookie eh_demo_mode=1, bypass Supabase auth check
-  const isDemoMode = request.cookies.get('eh_demo_mode')?.value === '1';
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // If Supabase network or token check fails, fall back to cookie indicators
+  }
 
   const isAuthPage =
     request.nextUrl.pathname.startsWith('/login') ||
@@ -54,13 +62,22 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/progress') ||
     request.nextUrl.pathname.startsWith('/settings');
 
-  if (!user && !isDemoMode && isDashboardPage) {
+  // An authenticated user is one who has:
+  // 1. Supabase user session, OR
+  // 2. Demo mode cookie, OR
+  // 3. Client auth session cookie, OR
+  // 4. Supabase auth token cookie
+  const isAuthenticated = Boolean(user || isDemoMode || hasAuthSession || hasSupabaseCookie);
+
+  // Only redirect if absolutely unauthenticated and trying to access dashboard pages
+  if (!isAuthenticated && isDashboardPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 
+  // If already authenticated and visiting auth pages (login/register), redirect to dashboard
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';

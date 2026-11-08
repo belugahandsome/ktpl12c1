@@ -48,19 +48,36 @@ function LoginForm() {
         }
 
         if (data.session) {
+          // Set auth cookie for seamless SSR middleware traversal
+          document.cookie = 'eh_auth_session=1; path=/; max-age=604800; SameSite=Lax';
+
+          // Store profile info
+          const realUser: UserProfile = {
+            id: data.user.id,
+            email: data.user.email || email,
+            display_name:
+              data.user.user_metadata?.full_name ||
+              email.split('@')[0] ||
+              'Học viên',
+            target_score: data.user.user_metadata?.target_score || 8.0,
+            created_at: data.user.created_at,
+          };
+          localStorage.setItem('eh_active_user', JSON.stringify(realUser));
+
           setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
           setTimeout(() => {
             router.push(redirectPath);
-          }, 800);
+          }, 600);
           return;
         }
       } else {
         // Fallback simulated login
+        document.cookie = 'eh_auth_session=1; path=/; max-age=604800; SameSite=Lax';
         const demoUser: UserProfile = {
           id: 'user-' + Date.now(),
           email,
           display_name: email.split('@')[0],
-          target_score: 8.5,
+          target_score: 8.0,
           created_at: new Date().toISOString(),
         };
         localStorage.setItem('eh_active_user', JSON.stringify(demoUser));

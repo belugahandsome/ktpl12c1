@@ -10,7 +10,7 @@ import {
 import { INITIAL_VOCABULARY } from '@/lib/data/initial-data';
 import { isSupabaseConfigured, createClient } from './client';
 
-const DEMO_USER_PROFILE: UserProfile = {
+export const DEMO_USER_PROFILE: UserProfile = {
   id: 'demo-student-id',
   email: 'student@englishhub.edu.vn',
   display_name: 'Nguyễn Văn Minh',
@@ -20,7 +20,7 @@ const DEMO_USER_PROFILE: UserProfile = {
   created_at: new Date().toISOString(),
 };
 
-const DEFAULT_PROGRESS: UserProgress = {
+export const DEMO_PROGRESS: UserProgress = {
   user_id: 'demo-student-id',
   words_learned: 28,
   grammar_completed: 6,
@@ -38,52 +38,78 @@ const DEFAULT_PROGRESS: UserProgress = {
   ],
 };
 
+export const EMPTY_PROGRESS: UserProgress = {
+  user_id: '',
+  words_learned: 0,
+  grammar_completed: 0,
+  exercises_completed: 0,
+  streak_days: 1,
+  last_active_date: new Date().toISOString().split('T')[0],
+  weekly_activity: [
+    { day: 'Thứ 2', count: 0, date: '' },
+    { day: 'Thứ 3', count: 0, date: '' },
+    { day: 'Thứ 4', count: 0, date: '' },
+    { day: 'Thứ 5', count: 0, date: '' },
+    { day: 'Thứ 6', count: 0, date: '' },
+    { day: 'Thứ 7', count: 0, date: '' },
+    { day: 'CN', count: 0, date: '' },
+  ],
+};
+
 // --- AUTH & PROFILE SERVICE ---
 export const getActiveUser = async (): Promise<UserProfile | null> => {
   if (typeof window === 'undefined') return null;
 
+  // 1. Check active Supabase session
   if (isSupabaseConfigured()) {
     try {
       const supabase = createClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session?.user) return null;
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-      if (profile) return profile as UserProfile;
+        if (profile) return profile as UserProfile;
 
-      return {
-        id: session.user.id,
-        email: session.user.email || '',
-        display_name:
-          session.user.user_metadata?.full_name ||
-          session.user.email?.split('@')[0] ||
-          'Học viên',
-        avatar_url: session.user.user_metadata?.avatar_url || '',
-        target_score: 8.0,
-        created_at: session.user.created_at,
-      };
+        return {
+          id: session.user.id,
+          email: session.user.email || '',
+          display_name:
+            session.user.user_metadata?.full_name ||
+            session.user.email?.split('@')[0] ||
+            'Học viên',
+          avatar_url: session.user.user_metadata?.avatar_url || '',
+          target_score: session.user.user_metadata?.target_score || 8.0,
+          created_at: session.user.created_at,
+        };
+      }
     } catch {
-      // Fallback
+      // Fallback to local storage
     }
   }
 
-  // Local storage fallback for seamless testing
+  // 2. Local storage check
   const stored = localStorage.getItem('eh_active_user');
   if (stored) {
     try {
       return JSON.parse(stored);
     } catch {
-      return DEMO_USER_PROFILE;
+      return null;
     }
   }
-  return DEMO_USER_PROFILE;
+
+  // 3. Check demo cookie
+  if (document.cookie.includes('eh_demo_mode=1')) {
+    return DEMO_USER_PROFILE;
+  }
+
+  return null;
 };
 
 export const updateActiveProfile = async (
@@ -109,7 +135,14 @@ export const updateActiveProfile = async (
     }
   }
 
-  const current = (await getActiveUser()) || DEMO_USER_PROFILE;
+  const current = (await getActiveUser()) || {
+    id: 'user-' + Date.now(),
+    email: '',
+    display_name: 'Học viên',
+    target_score: 8.0,
+    created_at: new Date().toISOString(),
+  };
+
   const updated: UserProfile = { ...current, ...updates };
   if (typeof window !== 'undefined') {
     localStorage.setItem('eh_active_user', JSON.stringify(updated));
@@ -119,7 +152,10 @@ export const updateActiveProfile = async (
 
 // --- USER PROGRESS SERVICE ---
 export const getUserProgress = async (): Promise<UserProgress> => {
-  if (typeof window === 'undefined') return DEFAULT_PROGRESS;
+  if (typeof window === 'undefined') return EMPTY_PROGRESS;
+
+  const activeUser = await getActiveUser();
+  const isDemo = activeUser?.id === 'demo-student-id';
 
   if (isSupabaseConfigured()) {
     try {
@@ -127,13 +163,28 @@ export const getUserProgress = async (): Promise<UserProgress> => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+
       if (user) {
         const { data } = await supabase
           .from('user_progress')
           .select('*')
           .eq('user_id', user.id)
           .single();
+
         if (data) return data as UserProgress;
+
+        // Brand new registered user has 0 progress
+        const initialProgress: UserProgress = {
+          ...EMPTY_PROGRESS,
+          user_id: user.id,
+        };
+
+        // Try to persist initial record in database
+        try {
+          await supabase.from('user_progress').insert(initialProgress);
+        } catch {}
+
+        return initialProgress;
       }
     } catch {
       // fallback
@@ -145,10 +196,17 @@ export const getUserProgress = async (): Promise<UserProgress> => {
     try {
       return JSON.parse(stored);
     } catch {
-      return DEFAULT_PROGRESS;
+      return isDemo ? DEMO_PROGRESS : EMPTY_PROGRESS;
     }
   }
-  return DEFAULT_PROGRESS;
+
+  // Only return pre-populated progress if the user explicitly chose Demo Account
+  if (isDemo) {
+    return DEMO_PROGRESS;
+  }
+
+  // Real new users start at 0
+  return EMPTY_PROGRESS;
 };
 
 export const incrementUserProgress = async (
@@ -291,7 +349,7 @@ export const saveQuizAttempt = async (
   const newAttempt: QuizAttempt = {
     ...attempt,
     id: `attempt-${Date.now()}`,
-    user_id: user?.id || 'demo-student-id',
+    user_id: user?.id || 'active-user',
     completed_at: new Date().toISOString(),
   };
 
@@ -365,22 +423,27 @@ export const getQuizAttempts = async (): Promise<QuizAttempt[]> => {
     }
   }
 
-  // Seed sample attempt for realistic dashboard statistics
-  const sampleAttempt: QuizAttempt = {
-    id: 'attempt-sample-1',
-    user_id: 'demo-student-id',
-    quiz_id: 'exam-thpt-2025-101',
-    quiz_title: 'Đề Thi Thử Tốt Nghiệp THPT Chuẩn Cấu Trúc - Đề Số 01',
-    quiz_type: 'mock_exam',
-    score: 8.6,
-    percentage: 86,
-    total_questions: 15,
-    correct_count: 13,
-    incorrect_count: 2,
-    time_spent_seconds: 1420,
-    answers: {},
-    completed_at: new Date(Date.now() - 86400000).toISOString(),
-  };
+  // Only return sample attempt for DEMO user profile
+  const activeUser = await getActiveUser();
+  if (activeUser?.id === 'demo-student-id') {
+    const sampleAttempt: QuizAttempt = {
+      id: 'attempt-sample-1',
+      user_id: 'demo-student-id',
+      quiz_id: 'exam-thpt-2025-101',
+      quiz_title: 'Đề Thi Thử Tốt Nghiệp THPT Chuẩn Cấu Trúc - Đề Số 01',
+      quiz_type: 'mock_exam',
+      score: 8.6,
+      percentage: 86,
+      total_questions: 15,
+      correct_count: 13,
+      incorrect_count: 2,
+      time_spent_seconds: 1420,
+      answers: {},
+      completed_at: new Date(Date.now() - 86400000).toISOString(),
+    };
+    return [sampleAttempt];
+  }
 
-  return [sampleAttempt];
+  // Real users start with a clean empty history
+  return [];
 };

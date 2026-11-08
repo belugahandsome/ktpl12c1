@@ -67,12 +67,27 @@ export default function RegisterPage() {
           return;
         }
 
+        // Set auth session cookie
+        document.cookie = 'eh_auth_session=1; path=/; max-age=604800; SameSite=Lax';
+
+        if (data.user) {
+          const newUser: UserProfile = {
+            id: data.user.id,
+            email: data.user.email || email,
+            display_name: fullName,
+            target_score: targetScore,
+            created_at: data.user.created_at,
+          };
+          localStorage.setItem('eh_active_user', JSON.stringify(newUser));
+        }
+
         setSuccessMsg('Đăng ký tài khoản thành công! Đang vào Dashboard...');
         setTimeout(() => {
           router.push('/dashboard');
         }, 800);
       } else {
         // Fallback local persistence
+        document.cookie = 'eh_auth_session=1; path=/; max-age=604800; SameSite=Lax';
         const newUser: UserProfile = {
           id: 'user-' + Date.now(),
           email,
