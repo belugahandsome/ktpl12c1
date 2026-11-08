@@ -59,7 +59,7 @@ export default function DashboardPage() {
   const dailyPercent = Math.round((dailyDone / dailyTarget) * 100);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-8 animate-fade-in">
       {/* 1. WELCOME SECTION */}
       <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
         {/* Decorative background glow */}
@@ -99,14 +99,14 @@ export default function DashboardPage() {
       {/* 2. LEARNING OVERVIEW STATS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Stat 1: Words */}
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow card-hover">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
               <Brain className="w-6 h-6" />
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-500">Từ Vựng Đã Học</p>
-              <h3 className="text-2xl font-extrabold text-slate-900">{totalWords}</h3>
+              <h3 className="text-2xl font-extrabold gradient-text">{totalWords}</h3>
               <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-0.5 mt-0.5">
                 <TrendingUp className="w-3 h-3" /> +5 từ hôm nay
               </p>
@@ -115,14 +115,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Stat 2: Grammar */}
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow card-hover">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <BookMarked className="w-6 h-6" />
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-500">Chuyên Đề Ngữ Pháp</p>
-              <h3 className="text-2xl font-extrabold text-slate-900">{grammarCount}/12</h3>
+              <h3 className="text-2xl font-extrabold gradient-text">{grammarCount}/12</h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                 Hoàn thành {Math.round((grammarCount / 12) * 100)}%
               </p>
@@ -131,14 +131,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Stat 3: Exercises */}
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow card-hover">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-500">Bài Tập Đã Làm</p>
-              <h3 className="text-2xl font-extrabold text-slate-900">{exercisesCount}</h3>
+              <h3 className="text-2xl font-extrabold gradient-text">{exercisesCount}</h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                 Độ chính xác ~ 86%
               </p>
@@ -147,14 +147,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Stat 4: Streak */}
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow card-hover">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
               <Flame className="w-6 h-6 fill-amber-500 text-amber-500" />
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-500">Chuỗi Học Tập (Streak)</p>
-              <h3 className="text-2xl font-extrabold text-slate-900">{streak} Ngày</h3>
+              <h3 className="text-2xl font-extrabold gradient-text">{streak} Ngày</h3>
               <p className="text-[11px] text-amber-600 font-bold mt-0.5">
                 Rèn luyện tuyệt vời!
               </p>
@@ -208,7 +208,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Category 1 */}
               <Link href="/vocabulary" className="group">
-                <Card className="h-full hover:border-indigo-300 hover:shadow-md transition-all">
+                <Card className="h-full hover:border-indigo-300 hover:shadow-md transition-all card-hover">
                   <CardContent className="p-5 space-y-3">
                     <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                       <Brain className="w-5 h-5" />
@@ -228,7 +228,7 @@ export default function DashboardPage() {
 
               {/* Category 2 */}
               <Link href="/grammar" className="group">
-                <Card className="h-full hover:border-blue-300 hover:shadow-md transition-all">
+                <Card className="h-full hover:border-blue-300 hover:shadow-md transition-all card-hover">
                   <CardContent className="p-5 space-y-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                       <BookMarked className="w-5 h-5" />
@@ -248,7 +248,7 @@ export default function DashboardPage() {
 
               {/* Category 3 */}
               <Link href="/sentence-structures" className="group">
-                <Card className="h-full hover:border-emerald-300 hover:shadow-md transition-all">
+                <Card className="h-full hover:border-emerald-300 hover:shadow-md transition-all card-hover">
                   <CardContent className="p-5 space-y-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                       <Layers className="w-5 h-5" />
@@ -268,7 +268,7 @@ export default function DashboardPage() {
 
               {/* Category 4 */}
               <Link href="/exam-practice" className="group">
-                <Card className="h-full hover:border-purple-300 hover:shadow-md transition-all">
+                <Card className="h-full hover:border-purple-300 hover:shadow-md transition-all card-hover">
                   <CardContent className="p-5 space-y-3">
                     <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
                       <GraduationCap className="w-5 h-5" />
