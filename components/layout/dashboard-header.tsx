@@ -37,6 +37,8 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
       const supabase = createClient();
       await supabase.auth.signOut();
     }
+    // Clear demo mode cookie
+    document.cookie = 'eh_demo_mode=; path=/; max-age=0';
     localStorage.removeItem('eh_active_user');
     router.push('/login');
   };

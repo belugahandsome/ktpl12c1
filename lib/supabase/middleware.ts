@@ -37,6 +37,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Allow demo mode: if cookie eh_demo_mode=1, bypass Supabase auth check
+  const isDemoMode = request.cookies.get('eh_demo_mode')?.value === '1';
+
   const isAuthPage =
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register') ||
@@ -51,7 +54,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/progress') ||
     request.nextUrl.pathname.startsWith('/settings');
 
-  if (!user && isDashboardPage) {
+  if (!user && !isDemoMode && isDashboardPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirect', request.nextUrl.pathname);

@@ -88,6 +88,8 @@ function LoginForm() {
       created_at: new Date().toISOString(),
     };
     localStorage.setItem('eh_active_user', JSON.stringify(demoUser));
+    // Set cookie so server-side middleware allows access without Supabase session
+    document.cookie = 'eh_demo_mode=1; path=/; max-age=86400; SameSite=Lax';
     setSuccessMsg('Đang đăng nhập với tài khoản Học Sinh Mẫu...');
     setTimeout(() => {
       router.push(redirectPath);
