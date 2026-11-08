@@ -131,16 +131,14 @@ export default function LandingPage() {
 
       {/* ── HERO SECTION WITH 2-COLUMN INTERACTIVE SHOWCASE ── */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-16 md:pb-28">
-        {/* Submerged Animated 3D Glass Book Background */}
+        {/* Full-bleed Submerged Animated 3D Glass Book Background */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full opacity-60 sm:opacity-75 animate-subtle-zoom">
-            <img
-              src="/images/bg-glass-book.jpg"
-              alt="3D Glass Book Banner"
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/40 via-transparent to-[#F8FAFC]" />
+          <img
+            src="/images/bg-glass-book.jpg"
+            alt="3D Glass Book Banner"
+            className="w-full h-full object-cover object-center scale-125 md:scale-115 animate-subtle-zoom opacity-70"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/30 via-transparent to-[#F8FAFC]" />
         </div>
 
         {/* Animated background ambient glow */}
@@ -297,23 +295,14 @@ export default function LandingPage() {
 
       {/* ── 3-STEP ROADMAP ── */}
       <section className="py-24 bg-gradient-to-b from-slate-50/70 via-indigo-50/30 to-slate-50/70 relative overflow-hidden">
-        {/* Submerged Animated 3D Rings Background */}
+        {/* Full-bleed Submerged Animated 3D Rings Background */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
-          <div className="absolute -top-10 -right-10 w-[550px] h-[550px] opacity-60 sm:opacity-75 animate-subtle-zoom">
-            <img
-              src="/images/bg-rings.jpg"
-              alt="3D Glowing Glass Rings"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="absolute -bottom-10 -left-10 w-[500px] h-[500px] opacity-50 sm:opacity-65 animate-subtle-drift">
-            <img
-              src="/images/bg-rings.jpg"
-              alt="3D Glowing Glass Rings"
-              className="w-full h-full object-contain rotate-180"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 via-transparent to-slate-50/60" />
+          <img
+            src="/images/bg-rings.jpg"
+            alt="3D Glowing Glass Rings"
+            className="w-full h-full object-cover object-center scale-110 animate-subtle-zoom opacity-70"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/70 via-transparent to-slate-50/70" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
