@@ -6,6 +6,7 @@ import { LiveTicker } from '@/components/home/live-ticker';
 import { HeroInteractive } from '@/components/home/hero-interactive';
 import { AiVideoShowcase } from '@/components/home/ai-video-showcase';
 import { AnimatedBackground } from '@/components/ui/animated-background';
+import { HeroCtaButtons } from '@/components/home/hero-cta-buttons';
 import {
   BookOpen,
   FileCheck2,
@@ -166,23 +167,8 @@ export default function LandingPage() {
                 hệ thống ngữ pháp cô đọng, 80+ cấu trúc câu ăn điểm và đề thi thử chuẩn format Bộ GD&ĐT.
               </p>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2 animate-fade-in-up delay-200">
-                <Link href="/register" className="w-full sm:w-auto">
-                  <button className="btn-shine w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
-                    <Zap className="w-4 h-4 text-amber-300" />
-                    Bắt Đầu Học Miễn Phí
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </Link>
-
-                <Link href="/login" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-base shadow-xs hover:border-indigo-300 transition-all">
-                    <Play className="w-4 h-4 text-indigo-600 fill-indigo-600" />
-                    Thử Tài Khoản Demo
-                  </button>
-                </Link>
-              </div>
+              {/* Action Buttons with login status awareness */}
+              <HeroCtaButtons />
 
               {/* User proof summary */}
               <div className="pt-3 flex items-center justify-center lg:justify-start gap-4 text-xs text-slate-500 animate-fade-in-up delay-300">

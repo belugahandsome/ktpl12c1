@@ -39,13 +39,17 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
+    const isDemoMode = request.cookies.get('eh_demo_mode')?.value === '1';
+    const hasAuthSession = request.cookies.get('eh_auth_session')?.value === '1';
+    const isAuthed = Boolean(user || isDemoMode || hasAuthSession);
+
     const isAuthPage =
       request.nextUrl.pathname.startsWith('/login') ||
       request.nextUrl.pathname.startsWith('/register') ||
       request.nextUrl.pathname.startsWith('/forgot-password');
 
-    // Only redirect if a logged-in user visits login/register pages
-    if (user && isAuthPage) {
+    // Only redirect if an authenticated user visits login/register pages
+    if (isAuthed && isAuthPage) {
       const url = request.nextUrl.clone();
       url.pathname = '/dashboard';
       return NextResponse.redirect(url);
