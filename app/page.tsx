@@ -132,25 +132,25 @@ export default function LandingPage() {
       {/* ── HERO SECTION WITH 2-COLUMN INTERACTIVE SHOWCASE ── */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-16 md:pb-28">
         {/* Submerged Animated 3D Glass Book Background */}
-        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-full opacity-20 mix-blend-multiply blur-[0.3px] animate-subtle-zoom">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full opacity-60 sm:opacity-75 animate-subtle-zoom">
             <img
               src="/images/bg-glass-book.jpg"
-              alt=""
-              className="w-full h-full object-cover object-center scale-105"
+              alt="3D Glass Book Banner"
+              className="w-full h-full object-cover object-center"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/50 via-transparent to-[#F8FAFC]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/40 via-transparent to-[#F8FAFC]" />
         </div>
 
         {/* Animated background ambient glow */}
-        <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-b from-indigo-100/70 via-purple-100/50 to-transparent rounded-full blur-3xl animate-pulse" />
           <div className="absolute top-20 right-5 w-80 h-80 bg-violet-200/40 rounded-full blur-3xl animate-float-slow" />
           <div className="absolute bottom-10 left-5 w-80 h-80 bg-blue-200/40 rounded-full blur-3xl animate-float-delayed" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* LEFT COLUMN: HERO HEADLINE & CTA */}
             <div className="lg:col-span-6 text-center lg:text-left space-y-6">
@@ -229,20 +229,20 @@ export default function LandingPage() {
       </section>
 
       {/* ── CORE FEATURES GRID ── */}
-      <section className="py-20 bg-white relative overflow-hidden" id="features">
+      <section className="py-24 relative overflow-hidden" id="features">
         {/* Submerged Animated 3D Bubbles Background */}
-        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
-          <div className="absolute inset-0 opacity-15 mix-blend-multiply animate-subtle-drift">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <div className="absolute inset-0 opacity-55 sm:opacity-70 animate-subtle-drift">
             <img
               src="/images/bg-bubbles.jpg"
-              alt=""
-              className="w-full h-full object-cover object-center"
+              alt="3D Glass Bubbles Background"
+              className="w-full h-full object-cover object-center scale-105"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/85 to-white" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/30 to-white/70" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-700 text-xs font-bold mb-4">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
@@ -251,7 +251,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-4">
               Mọi công cụ bạn cần để <span className="gradient-text">chinh phục điểm 8+ 9+</span>
             </h2>
-            <p className="text-slate-500 text-base">
+            <p className="text-slate-600 text-base font-medium">
               Thiết kế bám sát 100% theo ma trận đề thi tốt nghiệp THPT của Bộ Giáo dục & Đào tạo.
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function LandingPage() {
               return (
                 <div
                   key={i}
-                  className="group bg-white rounded-3xl border border-slate-200/80 p-6 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-50/80 transition-all duration-300 card-hover flex flex-col justify-between"
+                  className="group bg-white/90 backdrop-blur-md rounded-3xl border border-white/80 p-6 hover:border-indigo-300 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-300 card-hover flex flex-col justify-between shadow-lg shadow-slate-200/50"
                 >
                   <div>
                     <div
@@ -296,27 +296,27 @@ export default function LandingPage() {
       <AiVideoShowcase />
 
       {/* ── 3-STEP ROADMAP ── */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-indigo-50/30 relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-b from-slate-50/70 via-indigo-50/30 to-slate-50/70 relative overflow-hidden">
         {/* Submerged Animated 3D Rings Background */}
-        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
-          <div className="absolute -top-12 -right-12 w-[550px] h-[550px] opacity-20 mix-blend-multiply animate-subtle-zoom">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <div className="absolute -top-10 -right-10 w-[550px] h-[550px] opacity-60 sm:opacity-75 animate-subtle-zoom">
             <img
               src="/images/bg-rings.jpg"
-              alt=""
+              alt="3D Glowing Glass Rings"
               className="w-full h-full object-contain"
             />
           </div>
-          <div className="absolute -bottom-16 -left-16 w-[500px] h-[500px] opacity-15 mix-blend-multiply animate-subtle-drift">
+          <div className="absolute -bottom-10 -left-10 w-[500px] h-[500px] opacity-50 sm:opacity-65 animate-subtle-drift">
             <img
               src="/images/bg-rings.jpg"
-              alt=""
+              alt="3D Glowing Glass Rings"
               className="w-full h-full object-contain rotate-180"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/70 via-transparent to-indigo-50/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 via-transparent to-slate-50/60" />
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-3">
               Chỉ 3 bước bứt phá điểm số
@@ -375,22 +375,22 @@ export default function LandingPage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-white via-indigo-50/20 to-white">
         {/* Submerged Animated Real High School Graduates Background */}
-        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
-          <div className="absolute inset-0 opacity-12 mix-blend-multiply animate-subtle-zoom">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <div className="absolute inset-0 opacity-40 sm:opacity-55 animate-subtle-zoom">
             <img
               src="/images/bg-graduates.jpg"
-              alt=""
-              className="w-full h-full object-cover object-top filter contrast-[1.05]"
+              alt="High school graduates celebrating"
+              className="w-full h-full object-cover object-[center_15%]"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/45 to-white/85" />
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/60 text-amber-700 text-xs font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/60 text-amber-700 text-xs font-bold mb-4 shadow-xs">
               <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
               Đánh giá thực tế từ học sinh
             </div>
@@ -403,7 +403,7 @@ export default function LandingPage() {
             {TESTIMONIALS.map((t, i) => (
               <div
                 key={i}
-                className="bg-slate-50/70 rounded-3xl border border-slate-200/80 p-6 hover:shadow-lg transition-all card-hover flex flex-col justify-between"
+                className="bg-white/90 backdrop-blur-md rounded-3xl border border-white/90 p-6 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all card-hover flex flex-col justify-between shadow-lg shadow-slate-200/60"
               >
                 <div>
                   <div className="flex items-center gap-1 mb-4">
@@ -436,14 +436,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── CALL TO ACTION BOTTOM BANNER ── */}
-      <section className="py-20">
+      <section className="py-20 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-10 sm:p-14 text-center overflow-hidden shadow-2xl shadow-indigo-200">
+          <div className="relative bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-950 rounded-3xl p-10 sm:p-14 text-center overflow-hidden shadow-2xl shadow-indigo-300">
             {/* Submerged Animated Glass Book in Dark CTA */}
-            <div className="absolute inset-0 -z-0 pointer-events-none overflow-hidden select-none opacity-20 mix-blend-screen animate-subtle-drift">
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none opacity-50 mix-blend-screen animate-subtle-drift">
               <img
                 src="/images/bg-glass-book.jpg"
-                alt=""
+                alt="3D Glass Book in CTA"
                 className="w-full h-full object-cover object-center scale-110"
               />
             </div>
