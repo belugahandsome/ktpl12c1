@@ -17,6 +17,94 @@ interface IncomingMessage {
   content: string;
 }
 
+interface GeminiModelItem {
+  name: string;
+  supportedGenerationMethods?: string[];
+}
+
+let cachedModel: string | null = null;
+let lastCacheTime = 0;
+
+// Dynamically discover which model is enabled for this API key
+async function discoverModel(apiKey: string): Promise<string> {
+  const now = Date.now();
+  if (cachedModel && now - lastCacheTime < 1800000) {
+    return cachedModel;
+  }
+
+  try {
+    const listRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+      { cache: 'no-store' }
+    );
+
+    if (listRes.ok) {
+      const data = (await listRes.json()) as { models?: GeminiModelItem[] };
+      const models = data.models || [];
+
+      // Filter models that support generateContent
+      const generateModels = models.filter((m) =>
+        m.supportedGenerationMethods?.includes('generateContent')
+      );
+
+      // Preferred order: flash models first
+      const flash = generateModels.find(
+        (m) =>
+          m.name.includes('flash') &&
+          !m.name.includes('8b') &&
+          !m.name.includes('lite')
+      );
+
+      const anyFlash = generateModels.find((m) => m.name.includes('flash'));
+      const fallback = generateModels[0];
+
+      const selected = flash || anyFlash || fallback;
+      if (selected) {
+        // e.g. "models/gemini-2.5-flash" -> "gemini-2.5-flash"
+        const cleanName = selected.name.replace(/^models\//, '');
+        cachedModel = cleanName;
+        lastCacheTime = now;
+        return cleanName;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not list Gemini models:', err);
+  }
+
+  // Safe fallback if listing fails
+  return cachedModel || 'gemini-2.5-flash';
+}
+
+export async function GET() {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) {
+    return NextResponse.json({
+      status: 'error',
+      message: 'GEMINI_API_KEY is not configured in Vercel environment variables.',
+    });
+  }
+
+  try {
+    const listRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+      { cache: 'no-store' }
+    );
+    const data = await listRes.json();
+    const activeModel = await discoverModel(apiKey);
+
+    return NextResponse.json({
+      status: 'ok',
+      activeModel,
+      availableModels: data.models?.map((m: GeminiModelItem) => m.name) || [],
+    });
+  } catch (e: unknown) {
+    return NextResponse.json({
+      status: 'error',
+      message: (e as Error)?.message || 'Failed to query models',
+    });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = (await req.json()) as { messages?: IncomingMessage[] };
@@ -84,11 +172,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Dynamically pick the exact supported model for this API key
+    const modelToUse = await discoverModel(apiKey);
+
     // Helper to call Gemini API
     const callGemini = async (model: string) => {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 9000);
+      const timeoutId = setTimeout(() => controller.abort(), 9500);
 
       try {
         const res = await fetch(url, {
@@ -116,21 +207,20 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    // Use Google recommended model
     let response: Response | null = null;
     try {
-      response = await callGemini('gemini-3.8-flash');
+      response = await callGemini(modelToUse);
     } catch {
-      // Abort or network error
+      // Timeout or network error
     }
 
-    // If 503 or failed, do one quick retry after 500ms
+    // If 503 (high demand) or failed, retry once after 500ms
     if (!response || response.status === 503) {
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 500));
       try {
-        response = await callGemini('gemini-3.8-flash');
+        response = await callGemini(modelToUse);
       } catch {
-        // Abort or network error
+        // Retry failed
       }
     }
 
@@ -153,13 +243,13 @@ export async function POST(req: NextRequest) {
       if (response?.status === 503 || rawMsg.includes('high demand') || rawMsg.includes('overloaded')) {
         return NextResponse.json({
           reply:
-            '⏳ Máy chủ Google AI đang có lượng học sinh truy cập cao trong giây lát. Em hãy bấm gửi lại sau 5 - 10 giây nhé!',
+            '⏳ Máy chủ Google AI đang có lượng truy cập cao trong giây lát. Em hãy nhấn gửi lại câu hỏi sau 5 - 10 giây nhé!',
         });
       }
 
       return NextResponse.json({
         reply:
-          '⏳ Máy chủ AI đang phản hồi chậm do lưu lượng truy cập cao. Em bấm gửi lại câu hỏi sau vài giây nhé!',
+          '⏳ Máy chủ AI đang bận trong giây lát. Em bấm gửi lại câu hỏi để thử lại nhé!',
       });
     }
 
