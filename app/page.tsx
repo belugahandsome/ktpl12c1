@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/footer';
 import { LiveTicker } from '@/components/home/live-ticker';
 import { HeroInteractive } from '@/components/home/hero-interactive';
 import { AiVideoShowcase } from '@/components/home/ai-video-showcase';
+import { AnimatedBackground } from '@/components/ui/animated-background';
 import {
   BookOpen,
   FileCheck2,
@@ -122,7 +123,8 @@ const TESTIMONIALS = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] relative">
+      <AnimatedBackground />
       <Navbar />
       <LiveTicker />
 

@@ -10,6 +10,9 @@ import {
   LogOut,
   User as UserIcon,
   ChevronDown,
+  BookOpen,
+  Home,
+  Sparkles,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -80,6 +83,31 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
           <span>Mục tiêu: {user?.target_score ? user.target_score.toFixed(1) : '8.0'}đ</span>
         </div>
 
+        {/* LOGO ENGLISH HUB (GÓC PHẢI) - BẤM ĐỂ CHUYỂN VỀ TRANG CHỦ */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/80 text-slate-800 transition-all card-hover shadow-xs group"
+          title="Bấm vào logo ENGLISH HUB để chuyển về Trang Chủ ban đầu"
+        >
+          <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+            <BookOpen className="w-4 h-4" />
+          </div>
+          <div className="hidden sm:flex flex-col text-left">
+            <span className="font-black text-xs tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors leading-none">
+              ENGLISH<span className="text-indigo-600"> HUB</span>
+            </span>
+            <span className="text-[9px] text-slate-400 font-bold tracking-tight">
+              {user?.id === 'demo-student-id' ? 'Về Trang Chủ' : 'Trang Chủ'}
+            </span>
+          </div>
+          {user?.id === 'demo-student-id' && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+              Demo
+            </span>
+          )}
+          <Home className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors ml-0.5" />
+        </Link>
+
         {/* User profile dropdown */}
         <div className="relative">
           <button
@@ -106,6 +134,14 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
                 </p>
                 <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
               </div>
+
+              <Link
+                href="/"
+                className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-50"
+              >
+                <Home className="w-4 h-4 text-indigo-500" />
+                Về Trang Chủ Ban Đầu
+              </Link>
 
               <Link
                 href="/settings"

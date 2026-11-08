@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
+  Home,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -60,6 +61,11 @@ const NAV_ITEMS = [
     name: 'Cài Đặt Tài Khoản',
     href: '/settings',
     icon: Settings,
+  },
+  {
+    name: 'Về Trang Chủ',
+    href: '/',
+    icon: Home,
   },
 ];
 

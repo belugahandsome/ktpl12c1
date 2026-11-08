@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
+import { AnimatedBackground } from '@/components/ui/animated-background';
 
 export default function DashboardLayout({
   children,
@@ -13,7 +14,10 @@ export default function DashboardLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-[#F8FAFC] flex relative">
+      {/* Animated Floating Background */}
+      <AnimatedBackground />
+
       {/* Sidebar with Suspense boundary for usePathname */}
       <Suspense fallback={<div className="w-64 bg-white border-r border-slate-200" />}>
         <Sidebar
