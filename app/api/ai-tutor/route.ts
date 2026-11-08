@@ -107,27 +107,40 @@ export async function POST(req: NextRequest) {
       });
     };
 
-    // List of models to try in order of Google AI recommendation
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // List of models to try in order of capability and speed
     const candidateModels = [
       'gemini-3.8-flash',
       'gemini-2.5-flash',
+      'gemini-2.5-flash-latest',
+      'gemini-3.8-pro',
       'gemini-1.5-flash',
-      'gemini-2.0-flash',
     ];
 
     let response: Response | null = null;
-    let lastErrorData: { error?: { message?: string; status?: string; code?: number } } | null = null;
 
     for (const model of candidateModels) {
       response = await callGemini(model);
       if (response.ok) {
         break;
       }
-      // If 404 (model deprecated or not available), try next candidate
-      if (response.status === 404) {
+
+      // If temporary overload (503) or rate limit (429), pause briefly and retry once
+      if (response.status === 503 || response.status === 429) {
+        await sleep(700);
+        response = await callGemini(model);
+        if (response.ok) {
+          break;
+        }
+      }
+
+      // If 404 (not found), 503 (overload), 429 (rate limit), 500, 502 -> continue to next model
+      if ([404, 503, 429, 500, 502, 504].includes(response.status)) {
         continue;
       }
-      // If not 404 (e.g. invalid key, quota, etc.), stop and handle error
+
+      // If 400 or 403 (e.g. invalid key), stop trying
       break;
     }
 
@@ -145,6 +158,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           reply:
             '⚠️ API Key chưa hợp lệ. Bạn hãy kiểm tra lại xem chuỗi khóa `GEMINI_API_KEY` đã được copy đủ trên Google AI Studio chưa nhé!',
+        });
+      }
+
+      if (response?.status === 503 || rawMsg.includes('high demand') || rawMsg.includes('overloaded')) {
+        return NextResponse.json({
+          reply:
+            '⏳ Máy chủ Google Gemini đang gặp lượt truy cập đột biến trong giây lát. Em hãy nhấn gửi lại câu hỏi sau khoảng 5-10 giây là được nhé!',
         });
       }
 
