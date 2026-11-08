@@ -42,13 +42,13 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
         await supabase.auth.signOut();
       } catch {}
     }
-    // Clear cookies & storage
-    document.cookie = 'eh_demo_mode=; path=/; max-age=0';
-    document.cookie = 'eh_auth_session=; path=/; max-age=0';
+    // Clear cookies & storage cleanly
+    document.cookie = 'eh_demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'eh_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
     localStorage.removeItem('eh_active_user');
     localStorage.removeItem('eh_user_progress');
     localStorage.removeItem('eh_quiz_attempts');
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (

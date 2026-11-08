@@ -31,6 +31,17 @@ function LoginForm() {
       return;
     }
 
+    // Auto-detect demo account login to prevent failed Supabase request
+    const cleanEmail = email.toLowerCase().trim();
+    if (
+      cleanEmail === 'student@englishhub.edu.vn' ||
+      cleanEmail === 'demo@englishhub.edu.vn' ||
+      cleanEmail === 'demo'
+    ) {
+      handleQuickDemoLogin();
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -66,8 +77,8 @@ function LoginForm() {
 
           setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
           setTimeout(() => {
-            router.push(redirectPath);
-          }, 600);
+            window.location.href = redirectPath;
+          }, 400);
           return;
         }
       } else {
@@ -83,8 +94,8 @@ function LoginForm() {
         localStorage.setItem('eh_active_user', JSON.stringify(demoUser));
         setSuccessMsg('Đăng nhập thành công! Đang vào Dashboard...');
         setTimeout(() => {
-          router.push(redirectPath);
-        }, 600);
+          window.location.href = redirectPath;
+        }, 400);
       }
     } catch (err: unknown) {
       const error = err as Error;
@@ -96,6 +107,9 @@ function LoginForm() {
 
   const handleQuickDemoLogin = () => {
     setIsLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg('Đang đăng nhập với tài khoản Học Sinh Mẫu...');
+
     const demoUser: UserProfile = {
       id: 'demo-student-id',
       email: 'student@englishhub.edu.vn',
@@ -106,11 +120,20 @@ function LoginForm() {
     };
     localStorage.setItem('eh_active_user', JSON.stringify(demoUser));
     // Set cookie so server-side middleware allows access without Supabase session
-    document.cookie = 'eh_demo_mode=1; path=/; max-age=86400; SameSite=Lax';
-    setSuccessMsg('Đang đăng nhập với tài khoản Học Sinh Mẫu...');
+    document.cookie = 'eh_demo_mode=1; path=/; max-age=604800; SameSite=Lax';
+    document.cookie = 'eh_auth_session=1; path=/; max-age=604800; SameSite=Lax';
+
+    // Sign out from Supabase if any conflicting invalid token exists
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient();
+        supabase.auth.signOut().catch(() => {});
+      } catch {}
+    }
+
     setTimeout(() => {
-      router.push(redirectPath);
-    }, 500);
+      window.location.href = redirectPath;
+    }, 400);
   };
 
   return (

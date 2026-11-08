@@ -130,11 +130,17 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     if (isSupabaseConfigured()) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {}
     }
+    document.cookie = 'eh_demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'eh_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
     localStorage.removeItem('eh_active_user');
-    router.push('/login');
+    localStorage.removeItem('eh_user_progress');
+    localStorage.removeItem('eh_quiz_attempts');
+    window.location.href = '/login';
   };
 
   return (
