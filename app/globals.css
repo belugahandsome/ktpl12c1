@@ -307,22 +307,35 @@
               radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.12) 0%, transparent 45%);
 }
 
-/* Gradient border effect */
-.gradient-border {
-  position: relative;
-  background: #ffffff;
+/* Submerged Animated Background Layers */
+@keyframes slow-zoom-pan {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.06) translateY(-8px); }
+  100% { transform: scale(1.02) translateY(6px); }
 }
 
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: linear-gradient(135deg, #4f46e5, #9333ea, #38bdf8);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+@keyframes subtle-drift {
+  0% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-12px) translateX(8px); }
+  100% { transform: translateY(0) translateX(0); }
 }
+
+@keyframes gentle-spin-slow {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.animate-subtle-zoom {
+  animation: slow-zoom-pan 18s ease-in-out infinite alternate;
+}
+
+.animate-subtle-drift {
+  animation: subtle-drift 12s ease-in-out infinite alternate;
+}
+
+.animate-gentle-spin-slow {
+  animation: gentle-spin-slow 45s linear infinite;
+}
+
 
