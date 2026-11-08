@@ -7,7 +7,9 @@ export async function updateSession(request: NextRequest) {
   });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   // If Supabase credentials are not yet set, skip authentication check
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
@@ -50,8 +52,6 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/settings');
 
   if (!user && isDashboardPage) {
-    // If not authenticated and accessing dashboard routes, redirect to login
-    // Note: If running locally without supabase credentials, client fallback handles demo mode
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirect', request.nextUrl.pathname);
@@ -59,7 +59,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthPage) {
-    // User already authenticated, redirect away from login/register
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
