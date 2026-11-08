@@ -82,10 +82,12 @@ export function AiTutorWidget() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          messages: newMessages
+            .filter((m) => m.id !== 'welcome-msg')
+            .map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
         }),
       });
 

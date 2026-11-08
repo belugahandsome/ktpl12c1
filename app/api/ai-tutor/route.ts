@@ -12,9 +12,14 @@ Nhiệm vụ chính của bạn:
 6. Định dạng câu trả lời gọn gàng bằng gạch đầu dòng, in đậm từ khóa quan trọng.
 `.trim();
 
+interface IncomingMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { messages } = (await req.json()) as { messages?: IncomingMessage[] };
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -23,7 +28,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -35,46 +40,98 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Format messages for Google Gemini generateContent API
-    const contents = messages.map((m: { role: string; content: string }) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    }));
+    // 1. Filter out empty messages
+    const rawMessages = messages.filter(
+      (m) => m && typeof m.content === 'string' && m.content.trim().length > 0
+    );
 
-    // Call Google Gemini API (gemini-1.5-flash)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 2. Google Gemini requires the conversation to START with a 'user' turn.
+    // Strip any leading assistant/greeting messages.
+    let startIndex = 0;
+    while (
+      startIndex < rawMessages.length &&
+      rawMessages[startIndex].role === 'assistant'
+    ) {
+      startIndex++;
+    }
 
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        contents: contents,
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1200,
-        },
-      }),
-    });
+    const trimmed = rawMessages.slice(startIndex);
+    if (trimmed.length === 0) {
+      return NextResponse.json({
+        reply:
+          '👋 Chào bạn! Mình đã sẵn sàng hỗ trợ bạn ôn thi Tiếng Anh THPT 2027. Hãy gửi cho mình câu hỏi nhé!',
+      });
+    }
+
+    // 3. Google Gemini requires alternating 'user' and 'model' turns.
+    // Merge consecutive turns with the same role.
+    const contents: Array<{ role: 'user' | 'model'; parts: [{ text: string }] }> = [];
+    for (const msg of trimmed) {
+      const role: 'user' | 'model' = msg.role === 'assistant' ? 'model' : 'user';
+
+      if (contents.length > 0 && contents[contents.length - 1].role === role) {
+        contents[contents.length - 1].parts[0].text += '\n\n' + msg.content.trim();
+      } else {
+        contents.push({
+          role,
+          parts: [{ text: msg.content.trim() }],
+        });
+      }
+    }
+
+    // Guarantee the first turn is user
+    if (contents.length === 0 || contents[0].role !== 'user') {
+      return NextResponse.json({
+        reply: 'Bạn có câu hỏi tiếng Anh nào cần giải đáp không? Hãy nhập câu hỏi bên dưới nhé!',
+      });
+    }
+
+    // Helper to call Gemini API with specific model
+    const callGemini = async (model: string) => {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      return await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: SYSTEM_PROMPT }],
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1500,
+          },
+        }),
+      });
+    };
+
+    // Try gemini-1.5-flash first, fallback to gemini-2.0-flash if needed
+    let response = await callGemini('gemini-1.5-flash');
+
+    if (!response.ok && response.status === 404) {
+      response = await callGemini('gemini-2.0-flash');
+    }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string; status?: string; code?: number };
+      };
       console.error('Gemini API Error:', errorData);
 
-      // Friendly fallback if rate limited or invalid key
-      return NextResponse.json(
-        {
+      const rawMsg = errorData?.error?.message || response.statusText || 'Lỗi không xác định';
+
+      if (rawMsg.includes('API_KEY_INVALID') || rawMsg.includes('API key not valid')) {
+        return NextResponse.json({
           reply:
-            'Xin lỗi bạn, kết nối tới máy chủ Google Gemini đang bận hoặc API Key chưa được kích hoạt. Hãy thử lại sau vài giây hoặc kiểm tra biến GEMINI_API_KEY trên Vercel nhé!',
-        },
-        { status: 200 }
-      );
+            '⚠️ API Key chưa hợp lệ. Bạn hãy kiểm tra lại xem chuỗi khóa `GEMINI_API_KEY` đã được copy đủ trên Google AI Studio chưa nhé!',
+        });
+      }
+
+      return NextResponse.json({
+        reply: `⚠️ Không thể kết nối máy chủ Google Gemini (${response.status}): ${rawMsg}. Hãy thử lại sau vài giây nhé!`,
+      });
     }
 
     const data = await response.json();
@@ -88,8 +145,7 @@ export async function POST(req: NextRequest) {
     console.error('AI Tutor API internal error:', error);
     return NextResponse.json(
       {
-        reply:
-          'Đã xảy ra lỗi kết nối. Bạn vui lòng thử lại câu hỏi sau một lát nhé!',
+        reply: 'Đã xảy ra lỗi kết nối mạng. Bạn vui lòng thử lại câu hỏi sau một lát nhé!',
       },
       { status: 500 }
     );
