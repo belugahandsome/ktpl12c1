@@ -15,6 +15,7 @@ import {
   Award,
   HelpCircle,
   Play,
+  Mic,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { cn } from '@/lib/utils';
@@ -228,21 +229,30 @@ export function HeroInteractive() {
               </div>
 
               {/* Action buttons under flashcard */}
-              <div className="flex items-center justify-between gap-3 pt-1">
-                <button
-                  onClick={handleSpeak}
-                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-800 text-sm sm:text-base font-bold transition-colors"
+              <div className="flex flex-col gap-2.5 pt-1">
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    onClick={handleSpeak}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-800 text-sm sm:text-base font-bold transition-colors cursor-pointer"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    Nghe Phát Âm Mỹ
+                  </button>
+                  <button
+                    onClick={() => setIsFlipped(!isFlipped)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm sm:text-base font-bold transition-colors cursor-pointer"
+                  >
+                    <RotateCw className="w-4 h-4" />
+                    Lật Thẻ (Nghĩa Tiếng Việt)
+                  </button>
+                </div>
+                <Link
+                  href="/speaking"
+                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black shadow-md shadow-purple-200 transition-all card-hover"
                 >
-                  <Volume2 className="w-4 h-4" />
-                  Nghe Phát Âm Mỹ
-                </button>
-                <button
-                  onClick={() => setIsFlipped(!isFlipped)}
-                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm sm:text-base font-bold transition-colors"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  Lật Thẻ (Nghĩa Tiếng Việt)
-                </button>
+                  <Mic className="w-4 h-4" />
+                  <span>Luyện Phát Âm & AI Chấm Điểm Thang 10 🎙️</span>
+                </Link>
               </div>
             </div>
           )}

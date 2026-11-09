@@ -29,6 +29,7 @@ import {
   Volume2,
   Video,
   BarChart3,
+  Mic,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -40,6 +41,15 @@ const FEATURES = [
     title: 'Flashcard 3D Thông Minh',
     desc: 'Hệ thống Spaced Repetition (SRS) tối ưu hoá ghi nhớ 1.200+ từ vựng trọng tâm kèm phát âm bản xứ chuẩn IPA.',
     badge: '1.200+ từ',
+  },
+  {
+    icon: Mic,
+    color: 'from-purple-500 to-indigo-600',
+    bg: 'bg-purple-50',
+    iconColor: 'text-purple-600',
+    title: 'AI Chấm Điểm Speaking Thang 10',
+    desc: 'AI đọc mẫu bản xứ ➔ Bạn repeat vào mic ➔ Chấm điểm chuẩn 0-10 và nhận xét chi tiết âm đuôi, trọng âm cần cải thiện.',
+    badge: 'Mới ra mắt',
   },
   {
     icon: BookMarked,

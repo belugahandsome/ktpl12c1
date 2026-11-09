@@ -16,6 +16,7 @@ import {
   BookOpen,
   Home,
   X,
+  Mic,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -36,6 +37,11 @@ const NAV_ITEMS = [
     name: 'Từ Vựng (Vocab)',
     href: '/vocabulary',
     icon: Brain,
+  },
+  {
+    name: 'Luyện Speaking AI',
+    href: '/speaking',
+    icon: Mic,
   },
   {
     name: 'Ngữ Pháp (Grammar)',

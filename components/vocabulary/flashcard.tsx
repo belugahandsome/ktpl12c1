@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Volume2, RotateCw, CheckCircle2, Bookmark, Star, ArrowLeft, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Volume2, RotateCw, CheckCircle2, Bookmark, Star, ArrowLeft, ArrowRight, Mic } from 'lucide-react';
 import { Vocabulary, VocabLearningStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -90,13 +91,23 @@ export function Flashcard({
               <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-wider">
                 {vocabulary.topic}
               </span>
-              <button
-                onClick={handleSpeak}
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 flex items-center justify-center transition-colors"
-                title="Phát âm tiếng Anh"
-              >
-                <Volume2 className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/speaking"
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-10 h-10 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 flex items-center justify-center transition-colors shadow-xs"
+                  title="Luyện nói & Chấm điểm từ này với AI"
+                >
+                  <Mic className="w-5 h-5" />
+                </Link>
+                <button
+                  onClick={handleSpeak}
+                  className="w-10 h-10 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 flex items-center justify-center transition-colors"
+                  title="Phát âm tiếng Anh"
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="text-center space-y-3 my-auto">

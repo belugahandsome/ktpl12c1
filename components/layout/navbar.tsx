@@ -72,6 +72,13 @@ export function Navbar() {
               Từ Vựng (Vocab)
             </Link>
             <Link
+              href="/speaking"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors flex items-center gap-1.5"
+            >
+              <span>Luyện Speaking</span>
+              <span className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">AI</span>
+            </Link>
+            <Link
               href="/grammar"
               className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
@@ -192,6 +199,13 @@ export function Navbar() {
             className="block px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
           >
             Từ Vựng (Vocab)
+          </Link>
+          <Link
+            href="/speaking"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50/60 hover:bg-indigo-50"
+          >
+            🎙️ Luyện Speaking AI (Thang 10)
           </Link>
           <Link
             href="/grammar"

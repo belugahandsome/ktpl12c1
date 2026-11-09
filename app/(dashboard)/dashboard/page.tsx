@@ -20,6 +20,7 @@ import {
   Video,
   Play,
   Zap,
+  Mic,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -186,6 +187,32 @@ export default function DashboardPage() {
             <h2 className="text-xl sm:text-2xl font-black text-slate-900">Các Trụ Cột Ôn Luyện</h2>
             <span className="text-xs sm:text-sm text-slate-500 font-bold">Bám sát cấu trúc Bộ GD&ĐT</span>
           </div>
+
+          {/* AI SPEAKING BANNER FEATURE */}
+          <Link href="/speaking" className="group block">
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-900 text-white shadow-lg hover:shadow-2xl transition-all card-hover relative overflow-hidden">
+              <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-pink-500/20 rounded-full blur-2xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-amber-300 text-xs font-bold">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Mới ra mắt • AI Speaking Studio</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
+                    Luyện Nói & Chấm Điểm AI Thang 10 🎙️
+                  </h3>
+                  <p className="text-xs sm:text-sm text-purple-100 font-medium max-w-xl">
+                    AI đọc mẫu chuẩn bản xứ ➔ Bạn repeat vào mic ➔ Chấm điểm 0-10 và chỉ ra từng âm đuôi, trọng âm cần cải thiện!
+                  </p>
+                </div>
+                <div className="shrink-0 flex items-center gap-2 px-5 py-3 rounded-2xl bg-white text-indigo-950 font-black text-sm group-hover:scale-105 transition-transform shadow-md">
+                  <Mic className="w-4 h-4 text-purple-600" />
+                  <span>Vào Luyện Nói Ngay</span>
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </Link>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
             {/* Pillar 1: Vocab */}
