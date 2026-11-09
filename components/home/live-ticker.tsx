@@ -38,10 +38,10 @@ const TICKER_ITEMS = [
 
 export function LiveTicker() {
   return (
-    <div className="w-full bg-slate-900 border-y border-slate-800 text-white overflow-hidden py-2.5 relative select-none">
+    <div className="w-full bg-slate-900 border-y border-slate-800 text-white overflow-hidden py-3 relative select-none">
       {/* Subtle glowing side masks */}
-      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none" />
 
       <div className="animate-marquee flex items-center gap-10 whitespace-nowrap">
         {/* Render items twice for infinite seamless loop */}
@@ -50,9 +50,9 @@ export function LiveTicker() {
           return (
             <div
               key={idx}
-              className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-white transition-colors cursor-default"
+              className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold text-slate-200 hover:text-white transition-colors cursor-default"
             >
-              <Icon className={`w-3.5 h-3.5 ${item.color} shrink-0 animate-pulse`} />
+              <Icon className={`w-4 h-4 ${item.color} shrink-0 animate-pulse`} />
               <span>{item.text}</span>
               <span className="text-slate-600 ml-4">•</span>
             </div>

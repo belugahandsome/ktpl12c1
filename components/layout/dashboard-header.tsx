@@ -63,49 +63,49 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
+        <div className="hidden sm:flex items-center gap-2.5 text-sm font-bold text-slate-600">
           <span>Kỳ thi Tốt nghiệp THPT 2027</span>
           <span className="text-slate-300">•</span>
-          <span className="text-indigo-600 font-bold">Môn Tiếng Anh</span>
+          <span className="text-indigo-600 font-black">Môn Tiếng Anh</span>
         </div>
       </div>
 
       <div className="flex items-center gap-3 sm:gap-4">
         {/* Streak counter */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/70 text-amber-700 text-xs font-bold shadow-xs">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs sm:text-sm font-black shadow-xs">
           <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
           <span>{progress?.streak_days !== undefined ? progress.streak_days : 1} Ngày Streak</span>
         </div>
 
         {/* Target score pill */}
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/70 text-indigo-700 text-xs font-bold">
-          <Target className="w-3.5 h-3.5 text-indigo-600" />
+        <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs sm:text-sm font-black">
+          <Target className="w-4 h-4 text-indigo-600" />
           <span>Mục tiêu: {user?.target_score ? user.target_score.toFixed(1) : '8.0'}đ</span>
         </div>
 
         {/* LOGO ENGLISH HUB (GÓC PHẢI) - BẤM ĐỂ CHUYỂN VỀ TRANG CHỦ */}
         <Link
           href="/"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/80 text-slate-800 transition-all card-hover shadow-xs group"
+          className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/90 text-slate-800 transition-all card-hover shadow-xs group"
           title="Bấm vào logo ENGLISH HUB để chuyển về Trang Chủ ban đầu"
         >
-          <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-            <BookOpen className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+            <BookOpen className="w-5 h-5" />
           </div>
           <div className="hidden sm:flex flex-col text-left">
-            <span className="font-black text-xs tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors leading-none">
+            <span className="font-black text-sm tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors leading-none">
               ENGLISH<span className="text-indigo-600"> HUB</span>
             </span>
-            <span className="text-[9px] text-slate-400 font-bold tracking-tight">
+            <span className="text-[10px] text-slate-500 font-bold tracking-tight mt-0.5">
               {user?.id === 'demo-student-id' ? 'Về Trang Chủ' : 'Trang Chủ'}
             </span>
           </div>
           {user?.id === 'demo-student-id' && (
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+            <span className="text-xs font-black px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
               Demo
             </span>
           )}
-          <Home className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors ml-0.5" />
+          <Home className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors ml-0.5" />
         </Link>
 
         {/* User profile dropdown */}

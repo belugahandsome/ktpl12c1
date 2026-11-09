@@ -152,24 +152,24 @@ export function AiVideoShowcase() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200/70 text-indigo-700 text-xs font-bold mb-4 shadow-xs">
-            <Video className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200/80 text-indigo-700 text-sm sm:text-base font-bold mb-4 shadow-xs">
+            <Video className="w-4 h-4 text-indigo-600 animate-pulse" />
             <span>AI Short Video & Audio Học Tiếng Anh</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight mb-4 leading-tight">
             Học qua <span className="gradient-text">Video Ngắn & Giọng Đọc AI</span>
           </h2>
 
-          <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-700 text-lg sm:text-xl font-medium leading-relaxed">
             Mỗi bài giảng chỉ từ 45 - 60 giây, cô đọng đúng 1 trọng điểm ngữ pháp hoặc từ vựng thi THPT.
             Bấm để nghe giảng trực tiếp hoặc dùng AI tạo kịch bản video riêng!
           </p>
         </div>
 
         {/* ── 3 SHORT VIDEO CARDS ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-14">
           {SHORT_LESSONS.map((lesson) => {
             const isCurrent = selectedLesson.id === lesson.id && isPlaying;
 
@@ -186,7 +186,7 @@ export function AiVideoShowcase() {
                 {/* Video Header / Mock Player */}
                 <div
                   className={cn(
-                    'relative h-48 p-5 text-white flex flex-col justify-between overflow-hidden bg-gradient-to-br',
+                    'relative h-52 p-6 text-white flex flex-col justify-between overflow-hidden bg-gradient-to-br',
                     lesson.gradient
                   )}
                 >
@@ -195,10 +195,10 @@ export function AiVideoShowcase() {
 
                   {/* Top tags */}
                   <div className="relative z-10 flex items-center justify-between">
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md">
+                    <span className="text-xs sm:text-sm font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-md">
                       {lesson.subject}
                     </span>
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-black/30 backdrop-blur-md">
+                    <span className="text-xs sm:text-sm font-bold px-2.5 py-1 rounded-full bg-black/35 backdrop-blur-md">
                       ⏱ {lesson.duration}
                     </span>
                   </div>
@@ -208,7 +208,7 @@ export function AiVideoShowcase() {
                     <button
                       onClick={() => handleTogglePlay(lesson)}
                       className={cn(
-                        'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg',
+                        'w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg',
                         isCurrent
                           ? 'bg-white text-indigo-600 scale-110 glow-indigo'
                           : 'bg-white/90 hover:bg-white text-slate-900 group-hover:scale-105'
@@ -216,54 +216,54 @@ export function AiVideoShowcase() {
                       title={isCurrent ? 'Tạm dừng nghe' : 'Nghe AI Giảng bài'}
                     >
                       {isCurrent ? (
-                        <Pause className="w-6 h-6 fill-indigo-600" />
+                        <Pause className="w-7 h-7 fill-indigo-600" />
                       ) : (
-                        <Play className="w-6 h-6 ml-1 fill-slate-900" />
+                        <Play className="w-7 h-7 ml-1 fill-slate-900" />
                       )}
                     </button>
                   </div>
 
                   {/* Bottom Stats & Soundwave */}
-                  <div className="relative z-10 flex items-center justify-between text-[11px]">
-                    <span className="opacity-90">{lesson.views} lượt xem</span>
+                  <div className="relative z-10 flex items-center justify-between text-xs sm:text-sm font-bold">
+                    <span className="opacity-95">{lesson.views} lượt xem</span>
                     {isCurrent ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-white rounded-full animate-bounce" />
                         <span className="w-1 h-4 bg-white rounded-full animate-bounce delay-100" />
                         <span className="w-1 h-2 bg-white rounded-full animate-bounce delay-200" />
                         <span className="text-xs font-bold ml-1">Đang phát audio...</span>
                       </div>
                     ) : (
-                      <span className="opacity-80 flex items-center gap-1">
-                        <Volume2 className="w-3.5 h-3.5" /> Bấm nghe thử
+                      <span className="opacity-90 flex items-center gap-1">
+                        <Volume2 className="w-4 h-4" /> Bấm nghe thử
                       </span>
                     )}
                   </div>
                 </div>
 
                 {/* Content Body */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <h3 className="font-bold text-slate-900 text-sm leading-snug group-hover:text-indigo-600 transition-colors mb-2">
+                    <h3 className="font-black text-slate-900 text-base sm:text-lg leading-snug group-hover:text-indigo-600 transition-colors mb-3">
                       {lesson.title}
                     </h3>
 
-                    <div className="space-y-1.5 text-xs text-slate-600">
+                    <div className="space-y-2 text-sm sm:text-base text-slate-700 font-medium">
                       {lesson.summary.map((line, i) => (
-                        <div key={i} className="flex items-start gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
                           <span className="leading-tight">{line}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1">
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1.5">
                       {lesson.tags.map((tag, i) => (
                         <span
                           key={i}
-                          className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md"
+                          className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md"
                         >
                           #{tag}
                         </span>
@@ -271,7 +271,7 @@ export function AiVideoShowcase() {
                     </div>
                     <button
                       onClick={() => handleTogglePlay(lesson)}
-                      className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                      className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
                     >
                       {isCurrent ? 'Dừng' : 'Phát'}
                     </button>
@@ -283,26 +283,26 @@ export function AiVideoShowcase() {
         </div>
 
         {/* ── INTERACTIVE AI SCRIPT & VIDEO GENERATOR TOOL ── */}
-        <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-3xl p-7 sm:p-12 text-white shadow-xl relative overflow-hidden">
           <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-amber-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="relative z-10 max-w-3xl space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-amber-300 text-sm font-bold">
+              <Sparkles className="w-4 h-4" />
               <span>Công cụ AI: Tự tạo kịch bản video tiếng Anh ngắn theo chủ đề</span>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <div className="space-y-2.5">
+              <h3 className="text-2xl sm:text-4xl font-black tracking-tight">
                 Bạn muốn học nhanh chủ đề nào hôm nay?
               </h3>
-              <p className="text-slate-300 text-sm">
+              <p className="text-slate-300 text-base sm:text-lg font-medium leading-relaxed">
                 Chọn chủ đề bên dưới và AI sẽ tự động tạo kịch bản video ngắn 45 giây kèm giọng đọc AI thực chiến.
               </p>
             </div>
 
             {/* Quick Topic Chips */}
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-2.5 pt-1">
               {[
                 'Câu điều kiện loại 3',
                 'Mệnh đề quan hệ rút gọn',
@@ -314,7 +314,7 @@ export function AiVideoShowcase() {
                   key={topic}
                   onClick={() => setCustomTopic(topic)}
                   className={cn(
-                    'px-3 py-1.5 rounded-xl text-xs font-semibold transition-all',
+                    'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all',
                     customTopic === topic
                       ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-400'
                       : 'bg-white/10 text-slate-300 hover:bg-white/20'
@@ -330,30 +330,30 @@ export function AiVideoShowcase() {
               <button
                 onClick={handleGenerateScript}
                 disabled={isGenerating}
-                className="btn-shine inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all hover:scale-[1.02]"
+                className="btn-shine inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black text-sm sm:text-base shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all hover:scale-[1.02]"
               >
-                <Wand2 className="w-4 h-4" />
+                <Wand2 className="w-5 h-5" />
                 {isGenerating ? 'AI đang biên soạn kịch bản...' : `Tạo Video AI: "${customTopic}"`}
               </button>
             </div>
 
             {/* AI Generated Result Box */}
             {generatedScript && (
-              <div className="p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-3 animate-fade-in-up">
-                <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+              <div className="p-5 sm:p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-3.5 animate-fade-in-up">
+                <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-emerald-400">
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4" /> Đã tạo kịch bản thành công!
+                    <CheckCircle2 className="w-5 h-5" /> Đã tạo kịch bản thành công!
                   </span>
                   <button
                     onClick={handleSpeakGenerated}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 transition-colors text-xs sm:text-sm font-bold"
                   >
-                    <Volume2 className="w-3.5 h-3.5" />
+                    <Volume2 className="w-4 h-4" />
                     Nghe AI Đọc To Kịch Bản
                   </button>
                 </div>
 
-                <pre className="text-xs text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">
+                <pre className="text-sm sm:text-base text-slate-100 whitespace-pre-wrap font-sans leading-relaxed">
                   {generatedScript}
                 </pre>
               </div>

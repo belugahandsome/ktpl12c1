@@ -72,60 +72,60 @@ export function HeroInteractive() {
   return (
     <div className="relative w-full max-w-xl mx-auto lg:max-w-none">
       {/* ── FLOATING BADGES AROUND THE CARD ── */}
-      <div className="hidden sm:flex absolute -top-5 -left-4 z-20 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-md animate-float-slow">
-        <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-          <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-pulse" />
+      <div className="hidden sm:flex absolute -top-5 -left-4 z-20 items-center gap-2.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md animate-float-slow">
+        <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center">
+          <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-slate-800 leading-tight">Streak 7 Ngày</div>
-          <div className="text-[9px] text-slate-400 font-medium">Giữ nhịp ôn tập mỗi ngày</div>
+          <div className="text-xs sm:text-sm font-black text-slate-900 leading-tight">Streak 7 Ngày</div>
+          <div className="text-[10px] sm:text-xs text-slate-500 font-semibold">Giữ nhịp ôn tập mỗi ngày</div>
         </div>
       </div>
 
-      <div className="hidden sm:flex absolute -top-5 -right-3 z-20 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-md animate-float-delayed">
-        <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
-          <Target className="w-3.5 h-3.5 text-indigo-600" />
+      <div className="hidden sm:flex absolute -top-5 -right-3 z-20 items-center gap-2.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md animate-float-delayed">
+        <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
+          <Target className="w-4 h-4 text-indigo-600" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-indigo-600 leading-tight">Mục tiêu 9+ THPT</div>
-          <div className="text-[9px] text-slate-400 font-medium">Bộ đề chuẩn cấu trúc BGD</div>
+          <div className="text-xs sm:text-sm font-black text-indigo-600 leading-tight">Mục tiêu 9+ THPT</div>
+          <div className="text-[10px] sm:text-xs text-slate-500 font-semibold">Bộ đề chuẩn cấu trúc BGD</div>
         </div>
       </div>
 
-      <div className="hidden sm:flex absolute -bottom-5 -left-3 z-20 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-md animate-float-delayed">
-        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+      <div className="hidden sm:flex absolute -bottom-5 -left-3 z-20 items-center gap-2.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md animate-float-delayed">
+        <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-emerald-600" />
         </div>
-        <span className="text-[11px] font-bold text-slate-700">1.200+ Từ vựng trọng tâm</span>
+        <span className="text-xs sm:text-sm font-bold text-slate-800">1.200+ Từ vựng trọng tâm</span>
       </div>
 
-      <div className="hidden sm:flex absolute -bottom-5 -right-4 z-20 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-md animate-float-slow">
-        <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center">
-          <Award className="w-3.5 h-3.5 text-rose-500" />
+      <div className="hidden sm:flex absolute -bottom-5 -right-4 z-20 items-center gap-2.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md animate-float-slow">
+        <div className="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center">
+          <Award className="w-4 h-4 text-rose-500" />
         </div>
-        <span className="text-[11px] font-bold text-slate-700">Top 5% điểm thi cao</span>
+        <span className="text-xs sm:text-sm font-bold text-slate-800">Top 5% điểm thi cao</span>
       </div>
 
       {/* ── MAIN INTERACTIVE CONTAINER ── */}
       <div className="relative rounded-3xl p-1 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-2xl shadow-indigo-200/60 animate-pulse-glow">
-        <div className="bg-white rounded-[22px] p-5 sm:p-7 space-y-4">
+        <div className="bg-white rounded-[22px] p-6 sm:p-8 space-y-5">
           {/* Header Switcher: Flashcard vs Mini Quiz */}
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
             <div className="flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
+              <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
               </span>
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wider">
                 Trải nghiệm học thử trực tiếp
               </span>
             </div>
 
-            <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-semibold">
+            <div className="flex rounded-xl bg-slate-100 p-1 text-xs sm:text-sm font-bold">
               <button
                 onClick={() => setActiveTab('flashcard')}
                 className={cn(
-                  'px-3 py-1 rounded-lg transition-all',
+                  'px-3.5 py-1.5 rounded-lg transition-all',
                   activeTab === 'flashcard'
                     ? 'bg-white text-indigo-600 shadow-xs'
                     : 'text-slate-500 hover:text-slate-800'
@@ -136,7 +136,7 @@ export function HeroInteractive() {
               <button
                 onClick={() => setActiveTab('quiz')}
                 className={cn(
-                  'px-3 py-1 rounded-lg transition-all',
+                  'px-3.5 py-1.5 rounded-lg transition-all',
                   activeTab === 'quiz'
                     ? 'bg-white text-indigo-600 shadow-xs'
                     : 'text-slate-500 hover:text-slate-800'
@@ -152,7 +152,7 @@ export function HeroInteractive() {
             <div className="space-y-4">
               <div
                 onClick={() => setIsFlipped(!isFlipped)}
-                className="w-full h-56 sm:h-64 cursor-pointer select-none perspective-1000"
+                className="w-full h-60 sm:h-72 cursor-pointer select-none perspective-1000"
               >
                 <div
                   className={cn(
@@ -161,67 +161,67 @@ export function HeroInteractive() {
                   )}
                 >
                   {/* FRONT */}
-                  <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/50 rounded-2xl p-5 flex flex-col justify-between">
+                  <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/50 rounded-2xl p-6 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
-                      <span className="text-[11px] font-bold text-indigo-700 bg-indigo-100/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      <span className="text-xs sm:text-sm font-bold text-indigo-700 bg-indigo-100/70 px-3 py-1 rounded-full uppercase tracking-wider">
                         Từ vựng điểm 8+
                       </span>
                       <button
                         onClick={handleSpeak}
                         className={cn(
-                          'w-9 h-9 rounded-full flex items-center justify-center transition-all',
+                          'w-10 h-10 rounded-full flex items-center justify-center transition-all',
                           isPlayingAudio
                             ? 'bg-indigo-600 text-white scale-110 shadow-md'
                             : 'bg-white text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 shadow-xs'
                         )}
                         title="Nghe phát âm chuẩn"
                       >
-                        <Volume2 className={cn('w-4 h-4', isPlayingAudio && 'animate-bounce')} />
+                        <Volume2 className={cn('w-5 h-5', isPlayingAudio && 'animate-bounce')} />
                       </button>
                     </div>
 
-                    <div className="text-center my-auto space-y-1">
-                      <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    <div className="text-center my-auto space-y-1.5">
+                      <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
                         {word}
                       </div>
-                      <div className="text-xs text-indigo-600 font-semibold font-mono tracking-wide">
-                        {ipa} • <span className="text-slate-400 font-normal">noun</span>
+                      <div className="text-sm sm:text-base text-indigo-600 font-bold font-mono tracking-wide">
+                        {ipa} • <span className="text-slate-500 font-semibold">noun</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100 pt-2 font-medium">
-                      <span className="flex items-center gap-1 text-indigo-600 font-semibold">
-                        <RotateCw className="w-3 h-3" /> Chạm để lật thẻ
+                    <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 border-t border-slate-100 pt-2.5 font-semibold">
+                      <span className="flex items-center gap-1.5 text-indigo-600 font-bold">
+                        <RotateCw className="w-3.5 h-3.5" /> Chạm để lật thẻ
                       </span>
                       <span>Bấm loa để nghe phát âm</span>
                     </div>
                   </div>
 
                   {/* BACK */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-purple-50/80 via-white to-indigo-50/60 rounded-2xl p-5 flex flex-col justify-between">
+                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-purple-50/80 via-white to-indigo-50/60 rounded-2xl p-6 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
-                      <span className="text-[11px] font-bold text-purple-700 bg-purple-100/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      <span className="text-xs sm:text-sm font-bold text-purple-700 bg-purple-100/70 px-3 py-1 rounded-full uppercase tracking-wider">
                         Định nghĩa & Ví dụ
                       </span>
-                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                         Chuẩn thi THPT
                       </span>
                     </div>
 
-                    <div className="space-y-2 text-left my-auto">
-                      <div className="text-base sm:text-lg font-bold text-indigo-950">
+                    <div className="space-y-2.5 text-left my-auto">
+                      <div className="text-lg sm:text-xl font-black text-indigo-950">
                         {meaning}
                       </div>
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed italic">
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-sm sm:text-base text-slate-800 leading-relaxed italic font-medium">
                         "{example}"
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-xs sm:text-sm text-slate-600 font-medium">
                         👉 {exampleVi}
                       </div>
                     </div>
 
-                    <div className="text-center text-[11px] text-slate-400 font-medium border-t border-slate-100 pt-2">
-                      <span className="text-indigo-600 font-semibold">Chạm lại để quay về mặt trước</span>
+                    <div className="text-center text-xs sm:text-sm text-slate-500 font-semibold border-t border-slate-100 pt-2">
+                      <span className="text-indigo-600 font-bold">Chạm lại để quay về mặt trước</span>
                     </div>
                   </div>
                 </div>
@@ -231,16 +231,16 @@ export function HeroInteractive() {
               <div className="flex items-center justify-between gap-3 pt-1">
                 <button
                   onClick={handleSpeak}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-800 text-sm sm:text-base font-bold transition-colors"
                 >
-                  <Volume2 className="w-3.5 h-3.5" />
+                  <Volume2 className="w-4 h-4" />
                   Nghe Phát Âm Mỹ
                 </button>
                 <button
                   onClick={() => setIsFlipped(!isFlipped)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm sm:text-base font-bold transition-colors"
                 >
-                  <RotateCw className="w-3.5 h-3.5" />
+                  <RotateCw className="w-4 h-4" />
                   Lật Thẻ (Nghĩa Tiếng Việt)
                 </button>
               </div>
@@ -249,18 +249,18 @@ export function HeroInteractive() {
 
           {/* TAB 2: MINI QUIZ CHALLENGE */}
           {activeTab === 'quiz' && (
-            <div className="space-y-3.5 py-1">
-              <div className="text-left space-y-1">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600">
-                  <HelpCircle className="w-3.5 h-3.5" />
+            <div className="space-y-4 py-1">
+              <div className="text-left space-y-1.5">
+                <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-600">
+                  <HelpCircle className="w-4 h-4" />
                   Câu hỏi ôn luyện điểm 8+
                 </div>
-                <div className="text-sm sm:text-base font-bold text-slate-900">
+                <div className="text-base sm:text-lg font-black text-slate-900 leading-snug">
                   Từ nào dưới đây đồng nghĩa (CLOSEST in meaning) với <span className="text-indigo-600 underline underline-offset-2">"Resilience"</span>?
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { key: 'A', label: 'Perseverance', desc: 'Sự kiên trì, bền bỉ' },
                   { key: 'B', label: 'Hesitation', desc: 'Sự do dự, ngập ngừng' },
@@ -285,20 +285,20 @@ export function HeroInteractive() {
                       onClick={() => handleAnswerSelect(opt.key)}
                       disabled={selectedAnswer !== null}
                       className={cn(
-                        'p-3 rounded-xl border text-left transition-all duration-200 card-hover flex flex-col justify-between',
+                        'p-3.5 rounded-xl border text-left transition-all duration-200 card-hover flex flex-col justify-between',
                         btnStyle
                       )}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="w-5 h-5 rounded-md bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="w-6 h-6 rounded-md bg-slate-100 text-slate-800 text-xs sm:text-sm font-black flex items-center justify-center">
                           {opt.key}
                         </span>
                         {selectedAnswer !== null && opt.key === 'A' && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         )}
                       </div>
-                      <div className="text-xs font-bold text-slate-900">{opt.label}</div>
-                      <div className="text-[10px] text-slate-500">{opt.desc}</div>
+                      <div className="text-sm sm:text-base font-black text-slate-900">{opt.label}</div>
+                      <div className="text-xs text-slate-600 font-medium">{opt.desc}</div>
                     </button>
                   );
                 })}
@@ -308,16 +308,16 @@ export function HeroInteractive() {
               {selectedAnswer && (
                 <div
                   className={cn(
-                    'p-3 rounded-xl text-xs flex items-center justify-between animate-fade-in-up',
+                    'p-3.5 rounded-xl text-xs sm:text-sm flex items-center justify-between animate-fade-in-up',
                     isCorrect
-                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                      : 'bg-rose-50 border border-rose-200 text-rose-800'
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border border-rose-200 text-rose-900'
                   )}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">{isCorrect ? '🎉' : '💡'}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-lg">{isCorrect ? '🎉' : '💡'}</span>
                     <div>
-                      <span className="font-bold">
+                      <span className="font-black">
                         {isCorrect ? 'Chính xác 100%! Tuyệt vời!' : 'Chưa đúng rồi!'}
                       </span>{' '}
                       {isCorrect
@@ -327,7 +327,7 @@ export function HeroInteractive() {
                   </div>
                   <button
                     onClick={handleResetQuiz}
-                    className="shrink-0 ml-2 text-[11px] font-bold underline hover:opacity-80"
+                    className="shrink-0 ml-2 text-xs font-bold underline hover:opacity-80"
                   >
                     Thử lại
                   </button>

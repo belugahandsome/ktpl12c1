@@ -68,42 +68,42 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* ── 1. WELCOME HERO BANNER ── */}
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-7 sm:p-10 text-white shadow-xl relative overflow-hidden">
         {/* Ambient glowing blobs */}
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute left-1/3 bottom-0 w-72 h-72 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl space-y-3.5">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-amber-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+        <div className="relative z-10 max-w-4xl space-y-4">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-amber-300 text-xs sm:text-sm font-bold">
+              <Sparkles className="w-4 h-4" />
               <span>Kỳ thi Tốt nghiệp THPT Quốc Gia 2027</span>
             </div>
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-medium">
-              <Target className="w-3 h-3 text-indigo-300" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/30 text-indigo-100 text-xs sm:text-sm font-bold">
+              <Target className="w-3.5 h-3.5 text-indigo-300" />
               <span>Mục tiêu: {targetScore}đ</span>
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
             {greeting}, {user?.display_name || 'Học viên'}! 👋
           </h1>
 
-          <p className="text-indigo-100 text-xs sm:text-sm leading-relaxed max-w-2xl">
+          <p className="text-indigo-100 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl font-medium">
             "Sự kiên trì hôm nay là số điểm bứt phá ngày mai." Hãy hoàn thành mục tiêu 15 câu bài tập
             hôm nay để củng cố kiến thức và tự tin đạt điểm 8+ 9+ môn Tiếng Anh!
           </p>
 
-          <div className="pt-2 flex flex-wrap gap-3">
+          <div className="pt-2 flex flex-wrap gap-3.5">
             <Link href="/exam-practice/mock">
-              <button className="btn-shine inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-indigo-900 font-bold text-xs shadow-md transition-all">
-                <GraduationCap className="w-4 h-4 text-indigo-600" />
+              <button className="btn-shine inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-indigo-900 font-black text-sm sm:text-base shadow-md transition-all">
+                <GraduationCap className="w-5 h-5 text-indigo-600" />
                 Làm Đề Thi Thử Ngay
               </button>
             </Link>
             <Link href="/vocabulary">
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all backdrop-blur-md border border-white/15">
-                <Brain className="w-4 h-4 text-amber-300" />
+              <button className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md border border-white/20">
+                <Brain className="w-5 h-5 text-amber-300" />
                 Ôn Từ Vựng Flashcard
               </button>
             </Link>
@@ -115,14 +115,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Stat 1: Words Learned */}
         <Card className="hover:shadow-md transition-shadow card-hover">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-              <Brain className="w-6 h-6" />
+          <CardContent className="p-6 flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <Brain className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Từ Vựng Đã Học</p>
-              <h3 className="text-2xl font-black gradient-text">{totalWords}</h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-sm sm:text-base font-bold text-slate-600">Từ Vựng Đã Học</p>
+              <h3 className="text-3xl sm:text-4xl font-black gradient-text">{totalWords}</h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-0.5">
                 {totalWords > 0 ? `Đang ôn ${totalWords}/1.200 từ` : 'Bắt đầu học 10 từ đầu tiên'}
               </p>
             </div>
@@ -131,14 +131,14 @@ export default function DashboardPage() {
 
         {/* Stat 2: Grammar Completed */}
         <Card className="hover:shadow-md transition-shadow card-hover">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-              <BookMarked className="w-6 h-6" />
+          <CardContent className="p-6 flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <BookMarked className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Chuyên Đề Ngữ Pháp</p>
-              <h3 className="text-2xl font-black gradient-text">{grammarCount}/12</h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-sm sm:text-base font-bold text-slate-600">Chuyên Đề Ngữ Pháp</p>
+              <h3 className="text-3xl sm:text-4xl font-black gradient-text">{grammarCount}/12</h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-0.5">
                 {grammarCount > 0 ? `Đạt ${Math.round((grammarCount / 12) * 100)}%` : '12 chuyên đề điểm 8+'}
               </p>
             </div>
@@ -147,14 +147,14 @@ export default function DashboardPage() {
 
         {/* Stat 3: Exercises Completed */}
         <Card className="hover:shadow-md transition-shadow card-hover">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-6 h-6" />
+          <CardContent className="p-6 flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Bài Tập Đã Làm</p>
-              <h3 className="text-2xl font-black gradient-text">{exercisesCount}</h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-sm sm:text-base font-bold text-slate-600">Bài Tập Đã Làm</p>
+              <h3 className="text-3xl sm:text-4xl font-black gradient-text">{exercisesCount}</h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-0.5">
                 {exercisesCount > 0 ? 'Có lời giải chi tiết' : 'Chưa có bài tập nào'}
               </p>
             </div>
@@ -163,14 +163,14 @@ export default function DashboardPage() {
 
         {/* Stat 4: Streak Days */}
         <Card className="hover:shadow-md transition-shadow card-hover">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-              <Flame className="w-6 h-6 fill-amber-500 text-amber-500 animate-pulse" />
+          <CardContent className="p-6 flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <Flame className="w-7 h-7 fill-amber-500 text-amber-500 animate-pulse" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Chuỗi Học Tập (Streak)</p>
-              <h3 className="text-2xl font-black gradient-text">{streak} Ngày</h3>
-              <p className="text-[11px] text-amber-600 font-bold mt-0.5">
+              <p className="text-sm sm:text-base font-bold text-slate-600">Chuỗi Streak</p>
+              <h3 className="text-3xl sm:text-4xl font-black gradient-text">{streak} Ngày</h3>
+              <p className="text-xs sm:text-sm text-amber-700 font-bold mt-0.5">
                 {streak > 1 ? 'Giữ vững ngọn lửa!' : 'Bắt đầu ngày 1!'}
               </p>
             </div>
@@ -183,28 +183,28 @@ export default function DashboardPage() {
         {/* Left Column (2 Cols): Core Learning Pillars */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900">Các Trụ Cột Ôn Luyện</h2>
-            <span className="text-xs text-slate-400 font-medium">Bám sát cấu trúc Bộ GD&ĐT</span>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">Các Trụ Cột Ôn Luyện</h2>
+            <span className="text-xs sm:text-sm text-slate-500 font-bold">Bám sát cấu trúc Bộ GD&ĐT</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
             {/* Pillar 1: Vocab */}
             <Link href="/vocabulary" className="group">
-              <Card className="h-full hover:border-indigo-300 hover:shadow-lg transition-all card-hover">
-                <CardContent className="p-5 space-y-3">
-                  <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <Brain className="w-5 h-5" />
+              <Card className="h-full hover:border-indigo-300 hover:shadow-xl transition-all card-hover">
+                <CardContent className="p-6 space-y-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <Brain className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
+                    <h4 className="font-black text-lg sm:text-xl text-slate-900 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
                       Từ Vựng Flashcard 3D
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1.5 transition-transform" />
                     </h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed font-medium">
                       10 chủ đề trọng tâm, phát âm chuẩn IPA bản xứ và phương pháp lặp lại ngắt quãng.
                     </p>
                   </div>
-                  <div className="pt-2 flex items-center text-[11px] font-bold text-indigo-600">
+                  <div className="pt-2 flex items-center text-xs sm:text-sm font-black text-indigo-600">
                     <span>1.200+ từ vựng</span>
                   </div>
                 </CardContent>
@@ -213,21 +213,21 @@ export default function DashboardPage() {
 
             {/* Pillar 2: Grammar */}
             <Link href="/grammar" className="group">
-              <Card className="h-full hover:border-blue-300 hover:shadow-lg transition-all card-hover">
-                <CardContent className="p-5 space-y-3">
-                  <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <BookMarked className="w-5 h-5" />
+              <Card className="h-full hover:border-blue-300 hover:shadow-xl transition-all card-hover">
+                <CardContent className="p-6 space-y-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <BookMarked className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors flex items-center justify-between">
+                    <h4 className="font-black text-lg sm:text-xl text-slate-900 group-hover:text-blue-600 transition-colors flex items-center justify-between">
                       Ngữ Pháp Trọng Điểm
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1.5 transition-transform" />
                     </h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed font-medium">
                       12 chuyên đề then chốt: Thì, Bị động, Câu điều kiện, Đảo ngữ, Mệnh đề quan hệ.
                     </p>
                   </div>
-                  <div className="pt-2 flex items-center text-[11px] font-bold text-blue-600">
+                  <div className="pt-2 flex items-center text-xs sm:text-sm font-black text-blue-600">
                     <span>12 Chuyên đề trọng tâm</span>
                   </div>
                 </CardContent>
@@ -236,21 +236,21 @@ export default function DashboardPage() {
 
             {/* Pillar 3: Sentence Structures */}
             <Link href="/sentence-structures" className="group">
-              <Card className="h-full hover:border-emerald-300 hover:shadow-lg transition-all card-hover">
-                <CardContent className="p-5 space-y-3">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <Layers className="w-5 h-5" />
+              <Card className="h-full hover:border-emerald-300 hover:shadow-xl transition-all card-hover">
+                <CardContent className="p-6 space-y-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <Layers className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900 group-hover:text-emerald-600 transition-colors flex items-center justify-between">
+                    <h4 className="font-black text-lg sm:text-xl text-slate-900 group-hover:text-emerald-600 transition-colors flex items-center justify-between">
                       Cấu Trúc Câu Điểm 8+
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1.5 transition-transform" />
                     </h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed font-medium">
                       Đảo ngữ, câu chẻ, câu giả định, so sánh kép... ăn trọn điểm phần viết lại câu.
                     </p>
                   </div>
-                  <div className="pt-2 flex items-center text-[11px] font-bold text-emerald-600">
+                  <div className="pt-2 flex items-center text-xs sm:text-sm font-black text-emerald-600">
                     <span>80+ Cấu trúc vàng</span>
                   </div>
                 </CardContent>
@@ -259,21 +259,21 @@ export default function DashboardPage() {
 
             {/* Pillar 4: Mock Exams */}
             <Link href="/exam-practice" className="group">
-              <Card className="h-full hover:border-purple-300 hover:shadow-lg transition-all card-hover">
-                <CardContent className="p-5 space-y-3">
-                  <div className="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                    <GraduationCap className="w-5 h-5" />
+              <Card className="h-full hover:border-purple-300 hover:shadow-xl transition-all card-hover">
+                <CardContent className="p-6 space-y-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-base text-slate-900 group-hover:text-purple-600 transition-colors flex items-center justify-between">
+                    <h4 className="font-black text-lg sm:text-xl text-slate-900 group-hover:text-purple-600 transition-colors flex items-center justify-between">
                       Luyện Đề Chuẩn Bộ GD
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1.5 transition-transform" />
                     </h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed font-medium">
                       Phòng thi bấm giờ 60 phút, chấm điểm tự động và lời giải thích song ngữ từng câu.
                     </p>
                   </div>
-                  <div className="pt-2 flex items-center text-[11px] font-bold text-purple-600">
+                  <div className="pt-2 flex items-center text-xs sm:text-sm font-black text-purple-600">
                     <span>Format thi mới nhất</span>
                   </div>
                 </CardContent>
@@ -286,25 +286,25 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {/* DAILY LEARNING GOAL */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3.5">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="w-4 h-4 text-indigo-600" />
+                <CardTitle className="text-lg sm:text-xl font-black flex items-center gap-2">
+                  <Target className="w-5 h-5 text-indigo-600" />
                   Mục Tiêu Hôm Nay
                 </CardTitle>
-                <span className="text-xs font-bold text-indigo-600">{dailyPercent}%</span>
+                <span className="text-sm sm:text-base font-black text-indigo-600">{dailyPercent}%</span>
               </div>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm font-medium">
                 Chỉ tiêu 15 bài tập mỗi ngày để bứt phá điểm số
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <ProgressBar value={dailyPercent} barColor="bg-indigo-600" />
-              <div className="flex justify-between text-xs text-slate-600 font-semibold pt-1">
+              <div className="flex justify-between text-xs sm:text-sm text-slate-700 font-bold pt-1">
                 <span>Đã làm: {dailyDone} bài</span>
                 <span>Chỉ tiêu: {dailyTarget} bài</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                 {dailyDone === 0 ? (
                   <span>
                     💡 <strong>Gợi ý:</strong> Làm thử 1 đề kiểm tra 10 câu trắc nghiệm để hoàn thành 66% mục tiêu ngày hôm nay!
@@ -320,34 +320,34 @@ export default function DashboardPage() {
 
           {/* RECENT ACTIVITIES */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3.5">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-indigo-600" />
+                <CardTitle className="text-lg sm:text-xl font-black flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-indigo-600" />
                   Hoạt Động Gần Đây
                 </CardTitle>
                 {recentAttempts.length > 0 && (
                   <Link
                     href="/progress"
-                    className="text-xs font-semibold text-indigo-600 hover:underline"
+                    className="text-xs sm:text-sm font-bold text-indigo-600 hover:underline"
                   >
                     Xem tất cả
                   </Link>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3.5">
               {recentAttempts.length > 0 ? (
                 recentAttempts.slice(0, 3).map((attempt) => (
                   <div
                     key={attempt.id}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs hover:bg-slate-100/70 transition-colors"
+                    className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/80 transition-colors"
                   >
                     <div className="space-y-1 max-w-[70%]">
-                      <p className="font-bold text-slate-900 truncate">
+                      <p className="font-black text-sm sm:text-base text-slate-900 truncate">
                         {attempt.quiz_title}
                       </p>
-                      <p className="text-slate-500 text-[11px] flex items-center gap-2">
+                      <p className="text-slate-500 text-xs sm:text-sm font-semibold flex items-center gap-2">
                         <span>
                           Đúng: {attempt.correct_count}/{attempt.total_questions}
                         </span>
@@ -356,7 +356,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-extrabold text-indigo-600">
+                      <div className="text-base sm:text-lg font-black text-indigo-600">
                         {attempt.score.toFixed(1)}đ
                       </div>
                       <Badge variant={attempt.score >= 8 ? 'emerald' : 'blue'} size="sm">
@@ -366,22 +366,22 @@ export default function DashboardPage() {
                   </div>
                 ))
               ) : (
-                <div className="py-6 px-4 text-center space-y-3 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
-                  <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
-                    <GraduationCap className="w-5 h-5" />
+                <div className="py-7 px-4 text-center space-y-3.5 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
+                  <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-800">
+                    <p className="text-sm sm:text-base font-black text-slate-900">
                       Chưa có bài thi nào
                     </p>
-                    <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                    <p className="text-xs sm:text-sm text-slate-600 max-w-xs mx-auto font-medium">
                       Hãy bắt đầu bằng một bài kiểm tra ngắn để ghi nhận số điểm đầu tiên của bạn!
                     </p>
                   </div>
                   <Link href="/exam-practice/mock">
-                    <Button size="sm" variant="outline" className="text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+                    <Button size="sm" variant="outline" className="text-xs sm:text-sm font-bold text-indigo-600 border-indigo-200 hover:bg-indigo-50">
                       Làm bài kiểm tra đầu tiên
-                      <ArrowRight className="w-3 h-3 ml-1" />
+                      <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </Button>
                   </Link>
                 </div>

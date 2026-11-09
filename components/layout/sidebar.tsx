@@ -92,10 +92,10 @@ function NavLinksList({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 group',
+              'flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-base font-bold transition-all duration-150 group',
               isActive
-                ? 'bg-gradient-to-r from-indigo-50 to-indigo-100/50 text-indigo-700 shadow-sm border border-indigo-100'
-                : 'text-slate-600 hover:bg-slate-50/80 hover:text-slate-900'
+                ? 'bg-gradient-to-r from-indigo-50 to-indigo-100/60 text-indigo-700 shadow-xs border border-indigo-100'
+                : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
             )}
             title={isCollapsed ? item.name : undefined}
           >

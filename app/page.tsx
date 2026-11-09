@@ -151,18 +151,18 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* LEFT COLUMN: HERO HEADLINE & CTA */}
-            <div className="lg:col-span-6 text-center lg:text-left space-y-6">
+            <div className="lg:col-span-6 text-center lg:text-left space-y-7">
               {/* Animated Top Pill */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-indigo-200/80 shadow-xs animate-fade-in">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-xs font-bold text-indigo-700">
+              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/95 backdrop-blur-md border border-indigo-200/90 shadow-sm animate-fade-in">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-sm sm:text-base font-black text-indigo-700 tracking-wide">
                   Luyện Thi THPT Quốc Gia Chuẩn Cấu Trúc 2027
                 </span>
-                <ChevronRight className="w-3.5 h-3.5 text-indigo-400" />
+                <ChevronRight className="w-4 h-4 text-indigo-500" />
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] animate-fade-in-up">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.08] animate-fade-in-up">
                 Learn English{' '}
                 <span className="relative">
                   <span className="gradient-text">Smarter,</span>
@@ -172,7 +172,7 @@ export default function LandingPage() {
               </h1>
 
               {/* Subtitle */}
-              <p className="max-w-xl mx-auto lg:mx-0 text-base sm:text-lg text-slate-600 leading-relaxed animate-fade-in-up delay-100">
+              <p className="max-w-xl mx-auto lg:mx-0 text-lg sm:text-xl font-medium text-slate-700 leading-relaxed animate-fade-in-up delay-100">
                 Nền tảng học Tiếng Anh thông minh kết hợp Flashcard 3D có giọng đọc chuẩn, 
                 hệ thống ngữ pháp cô đọng, 80+ cấu trúc câu ăn điểm và đề thi thử chuẩn format Bộ GD&ĐT.
               </p>
@@ -181,13 +181,13 @@ export default function LandingPage() {
               <HeroCtaButtons />
 
               {/* User proof summary */}
-              <div className="pt-3 flex items-center justify-center lg:justify-start gap-4 text-xs text-slate-500 animate-fade-in-up delay-300">
+              <div className="pt-3 flex items-center justify-center lg:justify-start gap-4 text-sm sm:text-base text-slate-600 font-semibold animate-fade-in-up delay-300">
                 <div className="flex -space-x-2">
                   {['bg-indigo-500', 'bg-violet-500', 'bg-emerald-500', 'bg-amber-500'].map(
                     (bg, idx) => (
                       <div
                         key={idx}
-                        className={`w-7 h-7 rounded-full border-2 border-white ${bg} text-white font-bold text-[10px] flex items-center justify-center shadow-xs`}
+                        className={`w-8 h-8 rounded-full border-2 border-white ${bg} text-white font-bold text-xs flex items-center justify-center shadow-xs`}
                       >
                         {String.fromCharCode(65 + idx)}
                       </div>
@@ -195,7 +195,7 @@ export default function LandingPage() {
                   )}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-800">15.000+ Sĩ tử</span> đã tin tưởng lựa chọn
+                  <span className="font-extrabold text-slate-900">15.000+ Sĩ tử</span> đã tin tưởng lựa chọn
                 </div>
               </div>
             </div>
@@ -207,18 +207,18 @@ export default function LandingPage() {
           </div>
 
           {/* Quick Stats Banner under Hero */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto mt-16 pt-8 border-t border-slate-200/80">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto mt-16 pt-8 border-t border-slate-200/80">
             {STATS.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl border border-slate-200/80 p-5 text-center shadow-xs card-hover"
+                  className="bg-white/95 rounded-2xl border border-slate-200/90 p-6 text-center shadow-sm card-hover"
                 >
-                  <div className="text-2xl sm:text-3xl font-black text-indigo-600 mb-1">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-indigo-600 mb-2">
                     {stat.number}
                   </div>
-                  <div className="text-xs text-slate-500 font-medium">{stat.label}</div>
+                  <div className="text-sm sm:text-base text-slate-700 font-bold leading-tight">{stat.label}</div>
                 </div>
               );
             })}
@@ -241,47 +241,47 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-700 text-xs font-bold mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-sm sm:text-base font-bold mb-4 shadow-xs">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
               Lộ Trình Học Toàn Diện
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4 leading-tight">
               Mọi công cụ bạn cần để <span className="gradient-text">chinh phục điểm 8+ 9+</span>
             </h2>
-            <p className="text-slate-600 text-base font-medium">
+            <p className="text-slate-700 text-lg sm:text-xl font-medium">
               Thiết kế bám sát 100% theo ma trận đề thi tốt nghiệp THPT của Bộ Giáo dục & Đào tạo.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {FEATURES.map((f, i) => {
               const Icon = f.icon;
               return (
                 <div
                   key={i}
-                  className="group bg-white/90 backdrop-blur-md rounded-3xl border border-white/80 p-6 hover:border-indigo-300 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-300 card-hover flex flex-col justify-between shadow-lg shadow-slate-200/50"
+                  className="group bg-white/95 backdrop-blur-md rounded-3xl border border-white/90 p-7 hover:border-indigo-300 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-300 card-hover flex flex-col justify-between shadow-lg shadow-slate-200/50"
                 >
                   <div>
                     <div
-                      className={`w-12 h-12 rounded-2xl ${f.bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-200`}
+                      className={`w-14 h-14 rounded-2xl ${f.bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-200`}
                     >
-                      <Icon className={`w-6 h-6 ${f.iconColor}`} />
+                      <Icon className={`w-7 h-7 ${f.iconColor}`} />
                     </div>
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-slate-900 text-base leading-tight">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="font-black text-slate-900 text-lg sm:text-xl leading-tight">
                         {f.title}
                       </h3>
-                      <span className="ml-2 shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+                      <span className="ml-2 shrink-0 text-xs sm:text-sm font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                         {f.badge}
                       </span>
                     </div>
-                    <p className="text-slate-500 text-xs leading-relaxed">{f.desc}</p>
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed">{f.desc}</p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-100 flex items-center text-xs font-bold text-indigo-600 group-hover:text-indigo-700">
+                  <div className="pt-5 mt-5 border-t border-slate-100 flex items-center text-sm sm:text-base font-bold text-indigo-600 group-hover:text-indigo-700">
                     <span>Khám phá ngay</span>
-                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-5 h-5 ml-1.5 group-hover:translate-x-1.5 transition-transform" />
                   </div>
                 </div>
               );
@@ -306,14 +306,14 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-3">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">
               Chỉ 3 bước bứt phá điểm số
             </h2>
-            <p className="text-slate-500 text-base">Đơn giản, khoa học và nhìn thấy sự tiến bộ rõ rệt từng tuần.</p>
+            <p className="text-slate-700 text-lg sm:text-xl font-medium">Đơn giản, khoa học và nhìn thấy sự tiến bộ rõ rệt từng tuần.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
             {[
               {
                 step: '01',
@@ -344,17 +344,17 @@ export default function LandingPage() {
               return (
                 <div key={i} className="relative text-center">
                   {i < 2 && (
-                    <div className="hidden md:block absolute top-10 left-[calc(50%+2.5rem)] right-0 h-px border-t-2 border-dashed border-slate-200 z-0" />
+                    <div className="hidden md:block absolute top-10 left-[calc(50%+2.5rem)] right-0 h-px border-t-2 border-dashed border-slate-300 z-0" />
                   )}
-                  <div className="relative z-10 space-y-3">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white border border-slate-200/80 shadow-md mb-2 mx-auto card-hover">
-                      <div className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center`}>
-                        <Icon className={`w-6 h-6 ${item.color}`} />
+                  <div className="relative z-10 space-y-3.5">
+                    <div className="inline-flex items-center justify-center w-22 h-22 rounded-3xl bg-white border border-slate-200/90 shadow-md mb-2 mx-auto card-hover">
+                      <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center`}>
+                        <Icon className={`w-7 h-7 ${item.color}`} />
                       </div>
                     </div>
-                    <div className="text-xs font-black text-slate-300 tracking-widest">{item.step}</div>
-                    <h3 className="font-bold text-slate-900 text-base">{item.title}</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                    <div className="text-sm sm:text-base font-black text-indigo-400 tracking-widest">{item.step}</div>
+                    <h3 className="font-black text-slate-900 text-lg sm:text-xl leading-snug">{item.title}</h3>
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xs mx-auto">{item.desc}</p>
                   </div>
                 </div>
               );
@@ -378,44 +378,44 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14 max-w-xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/60 text-amber-700 text-xs font-bold mb-4 shadow-xs">
-              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+          <div className="text-center mb-16 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-700 text-sm sm:text-base font-bold mb-4 shadow-xs">
+              <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
               Đánh giá thực tế từ học sinh
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Sĩ tử nói gì về <span className="gradient-text">ENGLISH HUB?</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {TESTIMONIALS.map((t, i) => (
               <div
                 key={i}
-                className="bg-white/90 backdrop-blur-md rounded-3xl border border-white/90 p-6 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all card-hover flex flex-col justify-between shadow-lg shadow-slate-200/60"
+                className="bg-white/95 backdrop-blur-md rounded-3xl border border-white/90 p-7 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all card-hover flex flex-col justify-between shadow-lg shadow-slate-200/60"
               >
                 <div>
-                  <div className="flex items-center gap-1 mb-4">
+                  <div className="flex items-center gap-1.5 mb-4">
                     {[...Array(5)].map((_, j) => (
                       <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
                     ))}
-                    <span className="ml-auto text-xs font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <span className="ml-auto text-sm sm:text-base font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                       {t.score}đ THPT
                     </span>
                   </div>
-                  <p className="text-slate-700 text-xs leading-relaxed mb-6 italic">
+                  <p className="text-slate-800 text-sm sm:text-base leading-relaxed mb-6 italic font-medium">
                     &ldquo;{t.text}&rdquo;
                   </p>
                 </div>
-                <div className="flex items-center gap-3 pt-3 border-t border-slate-200/60">
+                <div className="flex items-center gap-3.5 pt-4 border-t border-slate-200/70">
                   <div
-                    className={`w-10 h-10 rounded-full ${t.color} text-white font-bold text-sm flex items-center justify-center shadow-xs`}
+                    className={`w-11 h-11 rounded-full ${t.color} text-white font-bold text-base flex items-center justify-center shadow-xs`}
                   >
                     {t.avatar}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-900">{t.name}</p>
-                    <p className="text-[11px] text-slate-500">{t.school}</p>
+                    <p className="text-sm sm:text-base font-bold text-slate-900">{t.name}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium">{t.school}</p>
                   </div>
                 </div>
               </div>
@@ -440,31 +440,31 @@ export default function LandingPage() {
             <div className="absolute top-0 right-0 w-80 h-80 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <div className="relative z-10 space-y-7">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 text-white text-sm sm:text-base font-bold backdrop-blur-md">
+                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
                 Hoàn toàn miễn phí 100%
               </div>
 
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
                 Sẵn sàng bứt phá<br />điểm 8+ môn Tiếng Anh?
               </h2>
 
-              <p className="text-indigo-200 text-sm sm:text-base max-w-xl mx-auto">
+              <p className="text-indigo-200 text-base sm:text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
                 Bắt đầu học ngay hôm nay để nắm chắc kiến thức và tự tin bước vào kỳ thi tốt nghiệp THPT Quốc Gia!
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-3">
                 <Link href="/register">
-                  <button className="btn-shine inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white text-indigo-900 font-bold text-base hover:bg-indigo-50 transition-all shadow-lg hover:-translate-y-0.5">
-                    <Zap className="w-4 h-4 text-indigo-600" />
+                  <button className="btn-shine inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-2xl bg-white text-indigo-900 font-black text-base sm:text-lg hover:bg-indigo-50 transition-all shadow-lg hover:-translate-y-0.5">
+                    <Zap className="w-5 h-5 text-indigo-600" />
                     Đăng Ký Miễn Phí
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 </Link>
                 <Link href="/login">
-                  <button className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold text-base hover:bg-white/20 transition-all">
-                    <Play className="w-4 h-4 fill-white" />
+                  <button className="inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-base sm:text-lg hover:bg-white/20 transition-all">
+                    <Play className="w-5 h-5 fill-white" />
                     Vào Bằng Tài Khoản Demo
                   </button>
                 </Link>

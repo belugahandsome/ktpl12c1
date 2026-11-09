@@ -37,61 +37,61 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo with interactive glow */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:bg-indigo-700 group-hover:scale-105 transition-all">
-              <BookOpen className="w-5 h-5" />
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:bg-indigo-700 group-hover:scale-105 transition-all">
+              <BookOpen className="w-6 h-6" />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <span className="font-black text-2xl tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
                 ENGLISH<span className="text-indigo-600"> HUB</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-bold tracking-wider -mt-1 uppercase">
+              <span className="text-xs text-slate-400 font-bold tracking-wider -mt-1 uppercase">
                 Luyện Thi THPT Quốc Gia
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-7">
+          <nav className="hidden md:flex items-center gap-7 lg:gap-8">
             <Link
               href="/"
-              className="text-xs font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
               Trang Chủ
             </Link>
             <Link
               href="#features"
-              className="text-xs font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
               Tính Năng
             </Link>
             <Link
               href="/vocabulary"
-              className="text-xs font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
               Từ Vựng (Vocab)
             </Link>
             <Link
               href="/grammar"
-              className="text-xs font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
               Ngữ Pháp (Grammar)
             </Link>
             <Link
               href="/exam-practice"
-              className="text-xs font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+              className="text-sm sm:text-base font-bold text-slate-700 hover:text-indigo-600 transition-colors"
             >
               Luyện Đề THPT
             </Link>
           </nav>
 
           {/* User Auth CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3.5">
             {/* Live Online Indicator */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs font-bold">
-              <span className="relative flex h-2 w-2">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-800 text-xs sm:text-sm font-bold">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
               </span>
               <span>1.4k sĩ tử online</span>
             </div>
