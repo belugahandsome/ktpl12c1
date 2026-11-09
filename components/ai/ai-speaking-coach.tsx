@@ -106,6 +106,7 @@ export function AiSpeakingCoach({
   const audioContextRef = useRef<AudioContext | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const latestTranscriptRef = useRef<string>('');
+  const latestConfidenceRef = useRef<number>(0.92);
   const evaluatedRef = useRef<boolean>(false);
 
   // Load history from localStorage
@@ -370,6 +371,11 @@ export function AiSpeakingCoach({
         const bestTranscript = final || interim;
         latestTranscriptRef.current = bestTranscript;
 
+        const rawConf = event.results[0]?.[0]?.confidence;
+        if (typeof rawConf === 'number' && rawConf > 0) {
+          latestConfidenceRef.current = rawConf;
+        }
+
         if (interim) {
           setInterimTranscript(interim);
         }
@@ -377,7 +383,7 @@ export function AiSpeakingCoach({
         if (final) {
           setFinalTranscript(final);
           evaluatedRef.current = true;
-          const confidence = event.results[0]?.[0]?.confidence || 0.92;
+          const confidence = latestConfidenceRef.current;
           processEvaluation(currentItem.targetText, final, confidence);
         }
       };
@@ -427,7 +433,7 @@ export function AiSpeakingCoach({
         if (!evaluatedRef.current && latestTranscriptRef.current.trim().length > 0) {
           evaluatedRef.current = true;
           setFinalTranscript(latestTranscriptRef.current);
-          processEvaluation(currentItem.targetText, latestTranscriptRef.current, 0.88);
+          processEvaluation(currentItem.targetText, latestTranscriptRef.current, latestConfidenceRef.current);
         } else if (!evaluatedRef.current && !latestTranscriptRef.current) {
           // If stopped without any words captured, suggest typing or checking mic
           setShowManualInput(true);
@@ -465,7 +471,7 @@ export function AiSpeakingCoach({
     if (!evaluatedRef.current && latestTranscriptRef.current.trim().length > 0) {
       evaluatedRef.current = true;
       setFinalTranscript(latestTranscriptRef.current);
-      processEvaluation(currentItem.targetText, latestTranscriptRef.current, 0.88);
+      processEvaluation(currentItem.targetText, latestTranscriptRef.current, latestConfidenceRef.current);
     }
   };
 
@@ -593,11 +599,15 @@ Học sinh vừa luyện phát âm:
 - Từ/câu mẫu chuẩn: "${result.expectedText}"
 - Học sinh vừa phát âm: "${result.transcript}"
 - Điểm thuật toán chấm hiện tại: ${result.score}/10.0
+- Các lỗi nhỏ phát hiện được: ${result.minorMistakes.length > 0 ? result.minorMistakes.join('; ') : 'Chưa ghi nhận'}
+- Các lỗi lớn phát hiện được: ${result.majorMistakes.length > 0 ? result.majorMistakes.join('; ') : 'Chưa ghi nhận'}
 
-Hãy đưa ra nhận xét ngắn gọn và thiết thực (3-4 gạch đầu dòng xúc tích, thân thiện):
-1. Đánh giá độ chính xác của phụ âm và nguyên âm
-2. Chỉ ra lỗi âm đuôi (như /s/, /z/, /ed/, /t/, /d/) hoặc lỗi trọng âm người Việt hay mắc phải
-3. Hướng dẫn khẩu hình miệng và cách phát âm để đạt điểm 10 tuyệt đối.`;
+YÊU CẦU ĐẶC BIỆT:
+Hãy chấm CỰC KỲ KHẮT KHE VÀ CÔNG TÂM. Tuyệt đối không nương tay hay khen chung chung nếu người học có bất kỳ lỗi nào dù là nhỏ nhất.
+Hãy tập trung phân tích sâu vào PHẦN NHƯỢC ĐIỂM (CÁC LỖI CẦN CẢI THIỆN):
+1. Vạch rõ từng lỗi phát âm cụ thể: âm nào đọc sai, thiếu âm đuôi gì (/s/, /ed/, /t/, /d/), đặt trọng âm sai ở đâu.
+2. Tại sao người Việt hay mắc lỗi này và sự khác biệt giữa cách đọc của học sinh với người bản xứ.
+3. Hướng dẫn khẩu hình miệng và vị trí đặt lưỡi chuẩn xác từng bước để sửa triệt để.`;
 
       const res = await fetch('/api/ai-tutor', {
         method: 'POST',
@@ -1217,22 +1227,33 @@ Hãy đưa ra nhận xét ngắn gọn và thiết thực (3-4 gạch đầu dò
 
                     {/* Quick test chips */}
                     <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                      <span className="text-slate-500 font-bold text-[11px]">Thử nghiệm:</span>
+                      <span className="text-slate-500 font-bold text-[11px]">Thử nghiệm độ khắt khe của AI:</span>
                       <button
                         onClick={() => handleManualEvaluate(currentItem.targetText)}
                         className="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-[11px] transition-colors cursor-pointer"
+                        title="Đọc đúng từng âm tiết"
                       >
-                        🎯 Đọc chuẩn 100% ({currentItem.targetText})
+                        🎯 Đọc chuẩn ({currentItem.targetText})
                       </button>
                       <button
                         onClick={() =>
                           handleManualEvaluate(
-                            currentItem.targetText.slice(0, -1) // drop ending sound
+                            currentItem.targetText.endsWith('s') || currentItem.targetText.endsWith('ce')
+                              ? currentItem.targetText.replace(/(s|ce)$/i, '')
+                              : currentItem.targetText + ' missing'
                           )
                         }
                         className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] transition-colors cursor-pointer"
+                        title="Thử xem AI có bắt lỗi nuốt âm đuôi không"
                       >
-                        ⚠️ Thiếu âm đuôi ({currentItem.targetText.slice(0, -1)})
+                        ⚠️ Thử lỗi thiếu âm đuôi
+                      </button>
+                      <button
+                        onClick={() => handleManualEvaluate('something completely different wrong')}
+                        className="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-[11px] transition-colors cursor-pointer"
+                        title="Thử xem đọc sai hẳn AI chấm thế nào"
+                      >
+                        ❌ Thử đọc sai hoàn toàn
                       </button>
                     </div>
                   </div>
@@ -1246,131 +1267,196 @@ Hãy đưa ra nhận xét ngắn gọn và thiết thực (3-4 gạch đầu dò
                     <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">
                       3
                     </span>
-                    <span>Bước 3: Kết Quả Đánh Giá & Điểm Số Trên Thang 10</span>
+                    <span>Bước 3: Kết Quả Đánh Giá & Điểm Số Trên Thang 10 (Chuẩn Khắt Khe)</span>
                   </div>
 
-                  {/* SCORE HERO BANNER */}
-                  <div className={`p-6 rounded-3xl border ${result.gradeBg} flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm`}>
-                    <div className="flex items-center gap-5 text-center sm:text-left">
-                      <div className="relative">
-                        <div className="w-24 h-24 rounded-2xl bg-white shadow-md border border-slate-200/80 flex flex-col items-center justify-center">
-                          <span className={`text-3xl sm:text-4xl font-black ${result.gradeColor}`}>
-                            {result.score.toFixed(1)}
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-400 -mt-1">THANG 10</span>
+                  {/* SCORE HERO BANNER WITH DETAILED SUBSCORES */}
+                  <div className={`p-6 rounded-3xl border ${result.gradeBg} shadow-sm space-y-4`}>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                      <div className="flex items-center gap-5 text-center sm:text-left">
+                        <div className="relative shrink-0">
+                          <div className="w-24 h-24 rounded-2xl bg-white shadow-md border border-slate-200/80 flex flex-col items-center justify-center">
+                            <span className={`text-3xl sm:text-4xl font-black ${result.gradeColor}`}>
+                              {result.score.toFixed(1)}
+                            </span>
+                            <span className="text-[10px] font-black text-slate-400 -mt-1 tracking-wider">THANG 10</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className={`text-xs sm:text-sm font-black uppercase tracking-wider ${result.gradeColor}`}>
+                            {result.score >= 9.5
+                              ? '🌟 ĐIỂM 10 TUYỆT ĐỐI'
+                              : result.score >= 9.0
+                              ? '✨ XUẤT SẮC (CHUẨN 9+)'
+                              : result.score >= 8.0
+                              ? '🎯 ĐẠT CHUẨN 8+ (CÓ LỖI NHỎ)'
+                              : result.score >= 6.5
+                              ? '⚠️ CẦN CHÚ Ý ÂM ĐUÔI'
+                              : '🔴 PHÁT ÂM LỆCH NHIỀU'}
+                          </div>
+                          <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                            {result.gradeLabel}
+                          </h3>
+                          <p className="text-xs text-slate-600 font-medium">
+                            {result.score < 10.0 && (
+                              <span>
+                                Đã trừ điểm vì phát hiện <strong>{result.minorMistakes.length + result.majorMistakes.length} lỗi phát âm</strong> (xem chi tiết mục Nhược điểm bên dưới).
+                              </span>
+                            )}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <div className={`text-xs sm:text-sm font-black uppercase tracking-wider ${result.gradeColor}`}>
-                          {result.score >= 9.0 ? '🌟 ĐỈNH CAO' : result.score >= 8.0 ? '🎯 ĐẠT CHUẨN 8+' : '🌱 CẦN RÈN LUYỆN'}
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                          {result.gradeLabel}
-                        </h3>
-                        <p className="text-xs text-slate-600 font-medium">
-                          Độ khớp từ vựng: <strong className="text-slate-900">{result.accuracyPercent}%</strong>
-                        </p>
+                      <div className="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                        <Button
+                          onClick={startListening}
+                          size="sm"
+                          className="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1.5 cursor-pointer"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Luyện Lại</span>
+                        </Button>
+                        <Button
+                          onClick={handleDeepGeminiAnalysis}
+                          disabled={isLoadingGemini}
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 sm:flex-initial border-purple-300 text-purple-700 hover:bg-purple-50 font-bold gap-1.5 cursor-pointer"
+                        >
+                          <Bot className="w-3.5 h-3.5" />
+                          <span>{isLoadingGemini ? 'Đang hỏi AI...' : 'AI Soi Lỗi'}</span>
+                        </Button>
                       </div>
                     </div>
 
-                    <div className="flex sm:flex-col gap-2 shrink-0">
-                      <Button
-                        onClick={startListening}
-                        size="sm"
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1.5 cursor-pointer"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Nói Lại</span>
-                      </Button>
-                      <Button
-                        onClick={handleDeepGeminiAnalysis}
-                        disabled={isLoadingGemini}
-                        variant="outline"
-                        size="sm"
-                        className="border-purple-300 text-purple-700 hover:bg-purple-50 font-bold gap-1.5 cursor-pointer"
-                      >
-                        <Bot className="w-3.5 h-3.5" />
-                        <span>{isLoadingGemini ? 'Đang hỏi AI...' : 'AI Nhận Xét'}</span>
-                      </Button>
+                    {/* Subscores Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200/60">
+                      <div className="p-2.5 rounded-xl bg-white/80 border border-slate-200/60 text-center">
+                        <div className="text-[10px] uppercase font-bold text-slate-500">Độ chuẩn từ vựng</div>
+                        <div className="text-base font-black text-slate-900">{result.accuracyPercent}%</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/80 border border-slate-200/60 text-center">
+                        <div className="text-[10px] uppercase font-bold text-slate-500">Chuẩn ngữ âm</div>
+                        <div className="text-base font-black text-indigo-700">{result.phoneticScore.toFixed(1)}/10</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/80 border border-slate-200/60 text-center">
+                        <div className="text-[10px] uppercase font-bold text-slate-500">Lưu loát & Nhịp</div>
+                        <div className="text-base font-black text-purple-700">{result.fluencyScore.toFixed(1)}/10</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/80 border border-slate-200/60 text-center">
+                        <div className="text-[10px] uppercase font-bold text-slate-500">Độ rõ bắt mic</div>
+                        <div className="text-base font-black text-emerald-700">{Math.round(result.confidence * 100)}%</div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* TRANSCRIPT COMPARISON */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Âm thanh máy tính nghe được từ bạn:
+                  {/* TRANSCRIPT COMPARISON & WORD BY WORD DIAGNOSTICS */}
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        Âm thanh máy tính nhận diện được:
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">
+                        {result.wordAnalysis.length} từ đối chiếu
+                      </span>
                     </div>
-                    <div className="text-base sm:text-lg font-black text-slate-900 font-mono">
+
+                    <div className="text-base sm:text-lg font-black text-slate-900 font-mono bg-white p-3 rounded-xl border border-slate-200">
                       "{result.transcript}"
                     </div>
 
-                    {/* Word-level highlights */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {result.wordAnalysis.map((item, idx) => (
+                    {/* Word-level diagnostic cards */}
+                    <div className="space-y-1.5 pt-1">
+                      <div className="text-xs font-bold text-slate-600">Đánh giá chi tiết từng từ:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {result.wordAnalysis.map((item, idx) => {
+                          const isPerfect = item.status === 'perfect';
+                          const isMinor = item.status === 'minor_mistake';
+                          const isMissing = item.status === 'missing';
+                          const isIncorrect = item.status === 'incorrect';
+
+                          return (
+                            <div
+                              key={idx}
+                              className={`p-2.5 rounded-xl text-xs font-bold border space-y-0.5 transition-all ${
+                                isPerfect
+                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                                  : isMinor
+                                  ? 'bg-amber-50 border-amber-300 text-amber-950'
+                                  : isMissing
+                                  ? 'bg-slate-100 border-slate-300 text-slate-700 opacity-80'
+                                  : 'bg-rose-50 border-rose-300 text-rose-950'
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                {isPerfect && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                                {isMinor && <AlertCircle className="w-3.5 h-3.5 text-amber-600" />}
+                                {isIncorrect && <AlertCircle className="w-3.5 h-3.5 text-rose-600" />}
+                                {isMissing && <span className="text-slate-400 text-xs">∅</span>}
+                                <span className="font-black text-sm">{item.expectedWord}</span>
+                              </div>
+
+                              <div className="text-[11px] font-normal opacity-90">
+                                {isPerfect ? (
+                                  <span className="text-emerald-700 font-semibold">Chuẩn xác 100%</span>
+                                ) : (
+                                  <span>
+                                    Nghe thành: <strong className="font-bold underline">{item.spokenWord}</strong>
+                                  </span>
+                                )}
+                              </div>
+
+                              {item.errorDetail && (
+                                <div className="text-[10px] text-rose-700 font-medium italic max-w-xs">
+                                  {item.errorDetail}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── HIGH VISIBILITY NHƯỢC ĐIỂM (CÁC LỖI CẦN CẢI THIỆN) ── */}
+                  <div className="p-5 rounded-2xl bg-rose-50/70 border-2 border-rose-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs sm:text-sm font-black uppercase text-rose-900 flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-rose-600" />
+                        <span>Phần Nhược Điểm: Các Lỗi Phát Âm Cần Cải Thiện</span>
+                      </div>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
+                        {result.improvements.length} lỗi ghi nhận
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs sm:text-sm text-rose-950 font-medium">
+                      {result.improvements.map((imp, idx) => (
                         <div
                           key={idx}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
-                            item.isMatch
-                              ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                              : item.similarity > 0.5
-                              ? 'bg-amber-50 border-amber-300 text-amber-800'
-                              : 'bg-rose-50 border-rose-300 text-rose-800'
-                          }`}
+                          className="p-3 rounded-xl bg-white/90 border border-rose-200/80 shadow-2xs leading-relaxed"
                         >
-                          {item.isMatch ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                          )}
-                          <span>{item.expectedWord}</span>
-                          {!item.isMatch && (
-                            <span className="text-[10px] opacity-75 font-normal">
-                              ({item.word})
-                            </span>
-                          )}
+                          {imp}
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* STRENGTHS & IMPROVEMENTS */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Strengths */}
-                    <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-                      <div className="text-xs font-black uppercase text-emerald-900 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        Điểm bạn làm tốt
-                      </div>
-                      <ul className="text-xs space-y-1.5 text-emerald-950 font-medium">
-                        {result.strengths.length > 0 ? (
-                          result.strengths.map((str, idx) => (
-                            <li key={idx} className="flex items-start gap-1.5">
-                              <span className="text-emerald-600 font-bold">•</span>
-                              <span>{str}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-emerald-700">Hãy tiếp tục luyện tập để cải thiện thêm!</li>
-                        )}
-                      </ul>
+                  {/* STRENGTHS */}
+                  <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                    <div className="text-xs font-black uppercase text-emerald-900 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      Điểm bạn làm tốt
                     </div>
-
-                    {/* Improvements */}
-                    <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-200 space-y-2">
-                      <div className="text-xs font-black uppercase text-rose-900 flex items-center gap-1.5">
-                        <AlertCircle className="w-4 h-4 text-rose-600" />
-                        Điểm cần khắc phục
-                      </div>
-                      <ul className="text-xs space-y-1.5 text-rose-950 font-medium">
-                        {result.improvements.map((imp, idx) => (
-                          <li key={idx} className="flex items-start gap-1.5">
-                            <span className="text-rose-600 font-bold">•</span>
-                            <span>{imp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <ul className="text-xs space-y-1.5 text-emerald-950 font-medium">
+                      {result.strengths.map((str, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-emerald-600 font-bold">•</span>
+                          <span>{str}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
                   {/* PHONETIC MOUTH PLACEMENT GUIDELINES */}
@@ -1382,8 +1468,7 @@ Hãy đưa ra nhận xét ngắn gọn và thiết thực (3-4 gạch đầu dò
                       </div>
                       <div className="space-y-1.5 text-xs text-indigo-950 font-medium">
                         {result.phoneticTips.map((tip, idx) => (
-                          <div key={idx} className="p-2 rounded-lg bg-white/80 border border-indigo-100 flex items-start gap-2">
-                            <span className="font-bold text-indigo-600">💡</span>
+                          <div key={idx} className="p-2.5 rounded-lg bg-white/80 border border-indigo-100 flex items-start gap-2">
                             <span>{tip}</span>
                           </div>
                         ))}

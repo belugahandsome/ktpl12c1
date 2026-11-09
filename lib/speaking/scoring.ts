@@ -1,28 +1,33 @@
-// Evaluation and scoring engine for AI Speaking & Pronunciation Practice
-// Normalized to Vietnamese education 10-point scale (Thang điểm 10)
+// Advanced Evaluation & Scoring Engine for AI Speaking & Pronunciation Practice
+// Rigorous 10-point scale (Thang điểm 10) with granular minor mistake detection
 
 export interface WordAnalysis {
-  word: string;
   expectedWord: string;
-  isMatch: boolean;
+  spokenWord: string;
+  status: 'perfect' | 'minor_mistake' | 'incorrect' | 'missing' | 'extra';
   similarity: number; // 0 to 1
-  note?: string;
+  errorDetail?: string;
+  phoneticNote?: string;
 }
 
 export interface PronunciationResult {
   score: number; // 0.0 to 10.0
+  accuracyPercent: number; // 0 to 100
+  phoneticScore: number; // 0.0 to 10.0
+  fluencyScore: number; // 0.0 to 10.0
   grade: 'excellent' | 'good' | 'average' | 'needs_work';
   gradeLabel: string;
-  gradeColor: string; // Tailwind class
+  gradeColor: string;
   gradeBg: string;
   transcript: string;
   expectedText: string;
-  accuracyPercent: number;
+  confidence: number;
   wordAnalysis: WordAnalysis[];
+  minorMistakes: string[]; // Specific minor errors identified
+  majorMistakes: string[]; // Specific major pronunciation deviations
   strengths: string[];
-  improvements: string[];
+  improvements: string[]; // Detailed, actionable improvement checklist
   phoneticTips: string[];
-  mouthPlacementGuide?: string;
 }
 
 // Clean and normalize text for pronunciation comparison
@@ -65,36 +70,63 @@ export function calculateSimilarity(s1: string, s2: string): number {
   return Math.max(0, 1 - distance / maxLen);
 }
 
-// Common phonetic pitfalls for Vietnamese learners of English
-const COMMON_VIETNAMESE_PITFALLS: {
-  test: (word: string) => boolean;
-  sound: string;
-  tip: string;
+// Detect ending sound dropping or alterations (s/es/ce/ed/t/d)
+function detectEndingSoundMistake(expected: string, spoken: string): string | null {
+  const exp = expected.toLowerCase();
+  const spk = spoken.toLowerCase();
+
+  // Case 1: Dropped plural or sibilant ending (-s, -es, -ce, -se)
+  if (
+    (exp.endsWith('s') || exp.endsWith('es') || exp.endsWith('ce') || exp.endsWith('se')) &&
+    !spk.endsWith('s') &&
+    !spk.endsWith('z') &&
+    !spk.endsWith('ce') &&
+    !spk.endsWith('se')
+  ) {
+    return `Nuốt âm đuôi gió /-s/ hoặc /-z/: Bạn đọc "${spk}" thay vì kết thúc bằng âm gió của "${exp}".`;
+  }
+
+  // Case 2: Dropped -ed ending (/t/, /d/, /ɪd/)
+  if (exp.endsWith('ed') && !spk.endsWith('ed') && !spk.endsWith('t') && !spk.endsWith('d')) {
+    return `Thiếu âm đuôi quá khứ "-ed": Từ gốc là "${exp}" nhưng bạn phát âm thành thể nguyên mẫu "${spk}".`;
+  }
+
+  // Case 3: Dropped final stop (/t/, /d/, /k/, /p/)
+  const stops = ['t', 'd', 'k', 'p'];
+  for (const stop of stops) {
+    if (exp.endsWith(stop) && !spk.endsWith(stop) && exp.length > 2) {
+      return `Bỏ quên âm chặn cuối /${stop}/: Hãy bật dứt khoát âm cuối của "${exp}".`;
+    }
+  }
+
+  return null;
+}
+
+// Pitfalls specifically tailored to Vietnamese learners
+const VIETNAMESE_PHONETIC_RULES: {
+  pattern: RegExp;
+  soundName: string;
+  explanation: string;
 }[] = [
   {
-    test: (w) => /[s|z|x|ce|se|ze]$/i.test(w) || w.endsWith('s') || w.endsWith('es'),
-    sound: 'Âm đuôi /-s/, /-z/, /-iz/',
-    tip: 'Người Việt hay quên bật âm gió cuối từ (ending /s/). Hãy giữ luồng hơi nhẹ qua kẽ răng khi kết thúc từ.',
+    pattern: /(resilience|perseverance|consequences|languages|makes|leads|circumstances)/i,
+    soundName: 'Âm xì hơi /s/ hoặc /z/ ở âm cuối',
+    explanation: 'Rất nhiều học sinh Việt Nam nuốt âm gió cuối cùng. Hãy đảm bảo khép nhẹ răng và đẩy hơi khi kết thúc.',
   },
   {
-    test: (w) => w.endsWith('ed'),
-    sound: 'Đuôi /-ed/ (/t/, /d/, /ɪd/)',
-    tip: 'Lưu ý 3 quy tắc phát âm đuôi -ed: /ɪd/ sau t/d (wanted), /t/ sau phụ âm vô thanh (looked, laughed), và /d/ cho các trường hợp còn lại.',
+    pattern: /(arrived|accomplished|finished|decided|looked)/i,
+    soundName: 'Phát âm đuôi -ed (/t/, /d/, /ɪd/)',
+    explanation: 'Đuôi -ed bắt buộc phải bật rõ. Nếu sau âm vô thanh như "sh" phải bật /t/ (accomplished), sau nguyên âm bật /d/ (arrived).',
   },
   {
-    test: (w) => /th/i.test(w),
-    sound: 'Âm /θ/ và /ð/ (th)',
-    tip: 'Đừng phát âm âm "th" thành âm "t" hay "d" tiếng Việt. Hãy đặt đầu lưỡi nhẹ giữa hai hàm răng và đẩy luồng hơi ra.',
+    pattern: /(catastrophe|characteristic|biodiversity|environmental)/i,
+    soundName: 'Trọng âm từ nhiều âm tiết',
+    explanation: 'Chú ý cao độ: ca-TAS-tro-phe (nhấn âm 2), cha-rac-te-RIS-tic (nhấn âm 4). Đừng đọc ngang bè bè các âm tiết.',
   },
   {
-    test: (w) => /[t|d|k|p|b|g]$/i.test(w),
-    sound: 'Âm chặn cuối từ (Final stops /t/, /d/, /k/, /p/)',
-    tip: 'Hãy bật dứt khoát âm cuối (chặn hơi lại một nhịp ngắn) để người bản xứ không nhầm lẫn với các từ đồng âm.',
-  },
-  {
-    test: (w) => /tion|sion|cial|tial/i.test(w),
-    sound: 'Âm /ʃ/ (sh mạnh)',
-    tip: 'Chu môi nhẹ tròn ra phía trước, đẩy hơi mạnh không rung dây thanh quản (ví dụ: education, pollution, commercial).',
+    pattern: /(breathes|clothes|threats|thought|than|the)/i,
+    soundName: 'Âm kẹp lưỡi /θ/ và /ð/',
+    explanation: 'Đặt đầu lưỡi nhẹ giữa hai hàm răng khi phát âm. Tránh đọc thành âm /t/ hoặc /d/ của tiếng Việt.',
   },
 ];
 
@@ -106,22 +138,28 @@ export function evaluatePronunciation(
   const cleanExpected = cleanSpeechText(expectedText);
   const cleanSpoken = cleanSpeechText(userTranscript);
 
+  // If no speech detected at all
   if (!cleanSpoken) {
     return {
       score: 0.0,
+      accuracyPercent: 0,
+      phoneticScore: 0.0,
+      fluencyScore: 0.0,
       grade: 'needs_work',
       gradeLabel: 'Chưa phát hiện giọng nói',
       gradeColor: 'text-rose-600',
       gradeBg: 'bg-rose-50 border-rose-200',
       transcript: '',
       expectedText,
-      accuracyPercent: 0,
+      confidence: 0,
       wordAnalysis: [],
+      minorMistakes: ['Microphone chưa thu được tín hiệu âm thanh nào.'],
+      majorMistakes: ['Không có dữ liệu âm thanh để chấm điểm.'],
       strengths: [],
       improvements: [
-        'Hệ thống chưa thu nhận được giọng nói. Bạn hãy kiểm tra quyền truy cập microphone trên trình duyệt và nói to, rõ ràng hơn nhé!',
+        'Hệ thống chưa nhận được giọng nói. Bạn hãy kiểm tra lại mic, đưa micro lại gần khoảng 15cm và nói to, rõ ràng hơn nhé!',
       ],
-      phoneticTips: ['Đảm bảo microphone không bị tắt tiếng (mute) và nói gần micro 15-20cm.'],
+      phoneticTips: ['Đảm bảo microphone không bị tắt tiếng và nói to dứt khoát.'],
     };
   }
 
@@ -129,66 +167,151 @@ export function evaluatePronunciation(
   const spokenWords = cleanSpoken.split(' ').filter(Boolean);
 
   const wordAnalysis: WordAnalysis[] = [];
+  const minorMistakes: string[] = [];
+  const majorMistakes: string[] = [];
   let totalWordSimilarity = 0;
+  let perfectWordCount = 0;
+
+  // Track matched spoken indices so we know if there are extra words
+  const matchedSpokenIndices = new Set<number>();
 
   expectedWords.forEach((expectedWord, idx) => {
     // Look for exact or closest word in spoken words nearby
-    const spokenWord = spokenWords[idx] || '';
-    let bestSimilarity = calculateSimilarity(expectedWord, spokenWord);
-    let matchedWord = spokenWord;
+    let bestSimilarity = 0;
+    let bestMatchIdx = -1;
 
-    // Search window of +- 1 position in case of dropped/added words
-    for (let offset = -1; offset <= 1; offset++) {
-      const neighborIdx = idx + offset;
-      if (neighborIdx >= 0 && neighborIdx < spokenWords.length) {
-        const sim = calculateSimilarity(expectedWord, spokenWords[neighborIdx]);
-        if (sim > bestSimilarity) {
-          bestSimilarity = sim;
-          matchedWord = spokenWords[neighborIdx];
-        }
+    for (let i = 0; i < spokenWords.length; i++) {
+      if (matchedSpokenIndices.has(i)) continue;
+      const sim = calculateSimilarity(expectedWord, spokenWords[i]);
+      if (sim > bestSimilarity) {
+        bestSimilarity = sim;
+        bestMatchIdx = i;
       }
     }
 
-    const isMatch = bestSimilarity >= 0.82;
+    const spokenWord = bestMatchIdx !== -1 ? spokenWords[bestMatchIdx] : '';
+    if (bestMatchIdx !== -1) {
+      matchedSpokenIndices.add(bestMatchIdx);
+    }
+
     totalWordSimilarity += bestSimilarity;
 
+    // Check specific minor error details
+    let status: WordAnalysis['status'] = 'incorrect';
+    let errorDetail: string | undefined = undefined;
+
+    if (bestSimilarity >= 0.99 && expectedWord === spokenWord) {
+      status = 'perfect';
+      perfectWordCount++;
+    } else if (bestSimilarity >= 0.75) {
+      status = 'minor_mistake';
+      // Detect ending sound mistake or substitution
+      const endingError = detectEndingSoundMistake(expectedWord, spokenWord);
+      if (endingError) {
+        errorDetail = endingError;
+        minorMistakes.push(endingError);
+      } else {
+        errorDetail = `Lệch nhẹ âm tiết: Phát âm thành "${spokenWord}" (chưa chuẩn xác 100% so với "${expectedWord}").`;
+        minorMistakes.push(
+          `Từ "${expectedWord}": Bạn phát âm thành "${spokenWord}". Cần chú ý độ căng của nguyên âm.`
+        );
+      }
+    } else if (bestMatchIdx === -1 || bestSimilarity < 0.35) {
+      status = 'missing';
+      errorDetail = `Bị bỏ sót hoàn toàn: Bạn không đọc từ "${expectedWord}".`;
+      majorMistakes.push(`Đọc thiếu từ "${expectedWord}" trong câu.`);
+    } else {
+      status = 'incorrect';
+      errorDetail = `Phát âm sai hẳn: Bạn đọc "${spokenWord}" thay vì "${expectedWord}".`;
+      majorMistakes.push(`Phát âm sai từ "${expectedWord}" thành "${spokenWord}".`);
+    }
+
     wordAnalysis.push({
-      word: matchedWord || '(bị bỏ sót)',
       expectedWord,
-      isMatch,
+      spokenWord: spokenWord || '(bị bỏ sót)',
+      status,
       similarity: bestSimilarity,
-      note: isMatch
-        ? 'Phát âm chính xác'
-        : bestSimilarity > 0.5
-        ? 'Gần đúng, chú ý âm tiết'
-        : 'Cần phát âm rõ hơn',
+      errorDetail,
     });
   });
 
-  // Calculate overall word-level accuracy (0 - 100)
-  const averageSimilarity =
+  // Check for extra words spoken
+  spokenWords.forEach((w, idx) => {
+    if (!matchedSpokenIndices.has(idx)) {
+      minorMistakes.push(`Thừa từ hoặc âm chêm: Hệ thống nghe thấy từ "${w}" không có trong câu mẫu.`);
+    }
+  });
+
+  // Length difference penalty (e.g. said 1 word when prompt had 8 words)
+  const lengthRatio =
+    Math.min(expectedWords.length, spokenWords.length) /
+    Math.max(expectedWords.length, spokenWords.length);
+
+  // Confidence check: If browser speech confidence is low (< 0.88), recognizer had to guess
+  const rawConfidence = typeof speechConfidence === 'number' ? speechConfidence : 0.85;
+
+  // Base accuracy (0 to 100)
+  const avgSimilarity =
     expectedWords.length > 0 ? totalWordSimilarity / expectedWords.length : 0;
-  
-  // Calculate raw score on a 10-point scale
-  // Factor in speech API recognition confidence (range 0.7 - 1.0)
-  const confidenceWeight = Math.min(1.0, Math.max(0.7, speechConfidence));
-  let rawScore = averageSimilarity * 9.5 * (0.8 + 0.2 * confidenceWeight);
+  const accuracyPercent = Math.round(avgSimilarity * lengthRatio * 100);
 
-  // Bonus for 100% exact match
-  if (cleanExpected === cleanSpoken) {
-    rawScore = 10.0;
-  } else if (rawScore > 9.8) {
-    rawScore = 9.8;
+  // ── RIGOROUS SCORING SYSTEM (THANG ĐIỂM 10) ──
+  // Start from maximum 10.0, apply deductions for every mistake
+  let calculatedScore = 10.0;
+
+  // Deduct for similarity shortfall
+  calculatedScore -= (1 - avgSimilarity) * 6.5;
+
+  // Deduct for length mismatch (missing words or extra mumbling)
+  if (lengthRatio < 1.0) {
+    calculatedScore -= (1 - lengthRatio) * 3.0;
   }
 
-  // Ensure minimum baseline if they spoke something recognizable
-  if (spokenWords.length > 0 && rawScore < 2.5) {
-    rawScore = Math.max(2.5, rawScore);
+  // Deduct for minor mistakes (-0.5 to -0.8 each)
+  calculatedScore -= minorMistakes.length * 0.6;
+
+  // Deduct for major mistakes (-1.2 to -2.0 each)
+  calculatedScore -= majorMistakes.length * 1.5;
+
+  // Confidence penalty: if speech confidence is low, student was unclear or slurring
+  if (rawConfidence < 0.88 && rawConfidence > 0) {
+    const confPenalty = (0.90 - rawConfidence) * 3.5;
+    calculatedScore -= Math.max(0.3, Math.min(1.8, confPenalty));
+    minorMistakes.push(
+      `Độ rõ nét của giọng đọc đạt ${Math.round(rawConfidence * 100)}%: Âm thanh còn hơi nhỏ hoặc chưa dứt khoát khiến máy học phải phỏng đoán từ.`
+    );
   }
 
-  // Round to 1 decimal place (e.g. 8.5)
-  const score = Math.round(rawScore * 10) / 10;
-  const accuracyPercent = Math.round(averageSimilarity * 100);
+  // STRICT RULE: 10.0 is ONLY possible when:
+  // 1. Every single word is a perfect match
+  // 2. No minor mistakes
+  // 3. No major mistakes
+  // 4. Confidence >= 0.90
+  const isPristine =
+    cleanExpected === cleanSpoken &&
+    minorMistakes.length === 0 &&
+    majorMistakes.length === 0 &&
+    rawConfidence >= 0.88;
+
+  if (isPristine) {
+    calculatedScore = 10.0;
+  } else if (cleanExpected === cleanSpoken && (minorMistakes.length > 0 || rawConfidence < 0.88)) {
+    // Spoken words match superficially, but confidence was low or minor phonetic deviation exists
+    calculatedScore = Math.min(8.8, Math.max(7.2, calculatedScore));
+  } else {
+    // Cap score if any mistakes exist
+    calculatedScore = Math.min(9.2, calculatedScore);
+  }
+
+  // Clamp score between 1.0 and 10.0 (or 0.0 if totally wrong)
+  if (avgSimilarity < 0.3) {
+    calculatedScore = Math.min(2.0, calculatedScore);
+  }
+  calculatedScore = Math.max(1.0, Math.min(10.0, calculatedScore));
+
+  const score = Math.round(calculatedScore * 10) / 10;
+  const phoneticScore = Math.round(Math.max(1.0, score * 0.95 + (avgSimilarity - 0.5)) * 10) / 10;
+  const fluencyScore = Math.round(Math.max(1.0, score * (0.8 + 0.2 * lengthRatio)) * 10) / 10;
 
   // Grade categorization
   let grade: 'excellent' | 'good' | 'average' | 'needs_work';
@@ -198,87 +321,98 @@ export function evaluatePronunciation(
 
   if (score >= 9.0) {
     grade = 'excellent';
-    gradeLabel = 'Xuất sắc! Chuẩn ngữ điệu bản xứ';
+    gradeLabel = 'Xuất sắc! Phát âm chuẩn bản xứ';
     gradeColor = 'text-emerald-600';
     gradeBg = 'bg-emerald-50 border-emerald-300';
   } else if (score >= 8.0) {
     grade = 'good';
-    gradeLabel = 'Rất tốt! Phát âm rõ ràng, chuẩn âm';
+    gradeLabel = 'Rất tốt! Đạt chuẩn 8+ (còn 1-2 lỗi nhỏ)';
     gradeColor = 'text-indigo-600';
     gradeBg = 'bg-indigo-50 border-indigo-300';
   } else if (score >= 6.5) {
     grade = 'average';
-    gradeLabel = 'Khá! Cần chú ý thêm âm đuôi và nối âm';
+    gradeLabel = 'Khá! Cần sửa lỗi âm đuôi & độ dứt khoát';
     gradeColor = 'text-amber-600';
     gradeBg = 'bg-amber-50 border-amber-300';
   } else {
     grade = 'needs_work';
-    gradeLabel = 'Cần cố gắng! Hãy nghe lại AI và repeat chậm';
+    gradeLabel = 'Cần cố gắng! Phát âm lệch nhiều so với mẫu';
     gradeColor = 'text-rose-600';
     gradeBg = 'bg-rose-50 border-rose-300';
   }
 
-  // Strengths identification
+  // ── IDENTIFY STRENGTHS ──
   const strengths: string[] = [];
-  if (score >= 8.0) {
-    strengths.push('Nhận diện âm rõ ràng, micro bắt âm tốt.');
-    strengths.push('Tốc độ nói và ngữ điệu tự nhiên, tự tin.');
-  }
-  const accurateCount = wordAnalysis.filter((w) => w.isMatch).length;
-  if (accurateCount === expectedWords.length) {
-    strengths.push(`Nói trọn vẹn ${expectedWords.length}/${expectedWords.length} từ mà không bị rơi rụng âm.`);
-  } else if (accurateCount > 0) {
-    strengths.push(`Đã phát âm chuẩn xác ${accurateCount}/${expectedWords.length} từ trong câu.`);
+  if (perfectWordCount === expectedWords.length) {
+    strengths.push(`Phát âm trọn vẹn chính xác toàn bộ ${expectedWords.length}/${expectedWords.length} từ trong câu.`);
+  } else if (perfectWordCount > 0) {
+    strengths.push(`Đã phát âm chuẩn xác ${perfectWordCount}/${expectedWords.length} từ khóa quan trọng.`);
   }
 
-  // Improvements and diagnostics
+  if (rawConfidence >= 0.88) {
+    strengths.push('Âm lượng và độ bắt mic rất tốt, giọng nói to và rõ ràng.');
+  }
+
+  if (lengthRatio >= 0.95) {
+    strengths.push('Tốc độ đọc vừa phải, không bị ngắt quãng hoặc ngập ngừng giữa chừng.');
+  }
+
+  if (strengths.length === 0) {
+    strengths.push('Bạn đã tự tin bấm micro và phát âm câu tiếng Anh.');
+  }
+
+  // ── IDENTIFY HIGHLY SPECIFIC IMPROVEMENTS (NHƯỢC ĐIỂM CẦN CẢI THIỆN) ──
   const improvements: string[] = [];
-  const phoneticTips: string[] = [];
 
-  const missedWords = wordAnalysis.filter((w) => !w.isMatch);
-  if (missedWords.length > 0) {
-    const listMissed = missedWords.map((w) => `"${w.expectedWord}"`).join(', ');
-    improvements.push(`Các từ cần điều chỉnh cách phát âm: ${listMissed}.`);
-  }
-
-  if (spokenWords.length < expectedWords.length) {
-    improvements.push(
-      `Bạn đang nói thiếu ${expectedWords.length - spokenWords.length} từ so với câu mẫu.`
-    );
-  }
-
-  // Check phonetic pitfalls for words in this sample
-  expectedWords.forEach((word) => {
-    COMMON_VIETNAMESE_PITFALLS.forEach((pitfall) => {
-      if (pitfall.test(word) && !phoneticTips.includes(pitfall.tip)) {
-        phoneticTips.push(`${pitfall.sound} trong từ "${word}": ${pitfall.tip}`);
-      }
+  // 1. Add specific major mistakes first
+  if (majorMistakes.length > 0) {
+    majorMistakes.forEach((m) => {
+      improvements.push(`🔴 ${m}`);
     });
+  }
+
+  // 2. Add specific minor mistakes
+  if (minorMistakes.length > 0) {
+    minorMistakes.forEach((m) => {
+      improvements.push(`🟡 ${m}`);
+    });
+  }
+
+  // 3. Check specific Vietnamese phonetic pitfalls for target sentence
+  const phoneticTips: string[] = [];
+  VIETNAMESE_PHONETIC_RULES.forEach((rule) => {
+    if (rule.pattern.test(expectedText) && !phoneticTips.includes(rule.explanation)) {
+      phoneticTips.push(`📌 ${rule.soundName}: ${rule.explanation}`);
+    }
   });
 
-  // Default fallback guidance if no specific pitfalls triggered
   if (phoneticTips.length === 0) {
     phoneticTips.push(
-      'Mẹo phát âm: Hãy mở rộng khẩu hình miệng và phát âm rõ từng nguyên âm, giữ hơi đều đặn từ bụng.'
+      '📌 Mẹo phát âm chuẩn: Mở rộng khẩu hình vòm họng và giữ hơi bụng đều đặn khi chuyển tiếp giữa các âm tiết.'
     );
   }
 
-  if (improvements.length === 0 && score >= 9.0) {
-    improvements.push('Phát âm của bạn đã đạt chuẩn 9+ THPT & IELTS Speaking! Tiếp tục duy trì phong độ.');
+  if (improvements.length === 0 && score === 10.0) {
+    improvements.push('🟢 Phát âm đạt điểm 10 tuyệt đối! Cả âm đuôi, ngữ điệu và độ dứt khoát đều hoàn hảo.');
   }
 
   return {
     score,
+    accuracyPercent,
+    phoneticScore: Math.min(10.0, phoneticScore),
+    fluencyScore: Math.min(10.0, fluencyScore),
     grade,
     gradeLabel,
     gradeColor,
     gradeBg,
     transcript: userTranscript,
     expectedText,
-    accuracyPercent,
+    confidence: rawConfidence,
     wordAnalysis,
+    minorMistakes,
+    majorMistakes,
     strengths,
     improvements,
-    phoneticTips: phoneticTips.slice(0, 3), // Top 3 practical tips
+    phoneticTips: phoneticTips.slice(0, 3),
   };
 }
