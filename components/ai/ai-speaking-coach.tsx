@@ -22,6 +22,11 @@ import {
   ExternalLink,
   Bot,
   Zap,
+  Settings2,
+  ShieldAlert,
+  Radio,
+  FileEdit,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -61,14 +66,28 @@ export function AiSpeakingCoach({
 
   // Audio Playback (AI Speech Synthesis)
   const [isAiSpeaking, setIsAiSpeaking] = useState<boolean>(false);
-  const [speechRate, setSpeechRate] = useState<number>(1.0); // 1.0 = normal, 0.75 = slow
 
-  // Voice Recording (Speech Recognition)
+  // Voice Recording (Speech Recognition & MediaRecorder)
   const [isListening, setIsListening] = useState<boolean>(false);
   const [interimTranscript, setInterimTranscript] = useState<string>('');
   const [finalTranscript, setFinalTranscript] = useState<string>('');
   const [micPermissionError, setMicPermissionError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<'not-allowed' | 'network' | 'no-speech' | 'not-supported' | 'other' | null>(null);
   const [hasSpeechRecognition, setHasSpeechRecognition] = useState<boolean>(true);
+  const [audioVolume, setAudioVolume] = useState<number>(0);
+  const [userAudioUrl, setUserAudioUrl] = useState<string | null>(null);
+  const [showTroubleshooter, setShowTroubleshooter] = useState<boolean>(false);
+  const [showManualInput, setShowManualInput] = useState<boolean>(false);
+  const [manualSpokenText, setManualSpokenText] = useState<string>('');
+
+  // Diagnostic state
+  const [diagRunning, setDiagRunning] = useState<boolean>(false);
+  const [diagResult, setDiagResult] = useState<{
+    micAvailable: boolean;
+    speechApiAvailable: boolean;
+    volumeDetected: boolean;
+    message: string;
+  } | null>(null);
 
   // Scoring & Feedback
   const [result, setResult] = useState<PronunciationResult | null>(null);
@@ -79,8 +98,15 @@ export function AiSpeakingCoach({
   // Practice History
   const [history, setHistory] = useState<PracticeHistoryItem[]>([]);
 
-  // Recognition ref
+  // Refs for audio handling
   const recognitionRef = useRef<any>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const latestTranscriptRef = useRef<string>('');
+  const evaluatedRef = useRef<boolean>(false);
 
   // Load history from localStorage
   useEffect(() => {
@@ -99,7 +125,34 @@ export function AiSpeakingCoach({
         setHasSpeechRecognition(false);
       }
     }
+
+    return () => {
+      cleanupAudio();
+    };
   }, []);
+
+  const cleanupAudio = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      try {
+        audioContextRef.current.close();
+      } catch {}
+      audioContextRef.current = null;
+    }
+  };
 
   // Determine current target item
   const currentItem: SpeakingItem | null =
@@ -108,16 +161,15 @@ export function AiSpeakingCoach({
           id: 'custom',
           category: 'vocab_stress',
           categoryLabel: 'Từ / Câu tự do',
-          targetText: customText.trim() || 'Perseverance',
-          ipa: customIpa.trim() || '/ˌpɜːsɪˈvɪərəns/',
-          stressGuide: 'Nhấn rõ trọng âm và âm đuôi',
+          targetText: customText.trim() || 'Resilience',
+          ipa: customIpa.trim() || '/rɪˈzɪliəns/',
+          stressGuide: 'Nhấn rõ trọng âm và phụ âm cuối',
           meaningVi: 'Nội dung bạn tự nhập để kiểm tra phát âm',
           difficulty: 'medium',
           tip: 'Hãy phát âm rõ ràng, to và dứt khoát các âm cuối /s/, /t/, /d/.',
         }
       : SPEAKING_PRESETS.find((p) => p.id === selectedPresetId) || SPEAKING_PRESETS[0];
 
-  // Stop any ongoing speech or recognition when item changes
   const handleSelectPreset = (id: string) => {
     stopAiSpeaking();
     stopListening();
@@ -125,7 +177,12 @@ export function AiSpeakingCoach({
     setResult(null);
     setFinalTranscript('');
     setInterimTranscript('');
+    latestTranscriptRef.current = '';
     setGeminiFeedback(null);
+    setUserAudioUrl(null);
+    setMicPermissionError(null);
+    setErrorType(null);
+    setShowManualInput(false);
   };
 
   // ── 1. AI SPEECH SYNTHESIS (AI ĐỌC MẪU) ──
@@ -142,7 +199,6 @@ export function AiSpeakingCoach({
     utterance.rate = rate;
     utterance.pitch = 1.0;
 
-    // Pick best English voice available
     const voices = window.speechSynthesis.getVoices();
     const naturalVoice = voices.find(
       (v) =>
@@ -154,17 +210,9 @@ export function AiSpeakingCoach({
       utterance.voice = naturalVoice;
     }
 
-    utterance.onstart = () => {
-      setIsAiSpeaking(true);
-    };
-
-    utterance.onend = () => {
-      setIsAiSpeaking(false);
-    };
-
-    utterance.onerror = () => {
-      setIsAiSpeaking(false);
-    };
+    utterance.onstart = () => setIsAiSpeaking(true);
+    utterance.onend = () => setIsAiSpeaking(false);
+    utterance.onerror = () => setIsAiSpeaking(false);
 
     window.speechSynthesis.speak(utterance);
   };
@@ -177,24 +225,119 @@ export function AiSpeakingCoach({
   };
 
   // ── 2. MICROPHONE & SPEECH RECOGNITION (NGƯỜI HỌC REPEAT) ──
-  const startListening = () => {
+  const startListening = async () => {
     if (typeof window === 'undefined') return;
 
     stopAiSpeaking();
+    cleanupAudio();
+
     setMicPermissionError(null);
+    setErrorType(null);
     setResult(null);
     setFinalTranscript('');
     setInterimTranscript('');
+    latestTranscriptRef.current = '';
+    evaluatedRef.current = false;
     setGeminiFeedback(null);
+    setUserAudioUrl(null);
 
+    // Step A: Explicitly request microphone stream via getUserMedia
+    // This forces browser permission prompt if not yet granted
+    let stream: MediaStream | null = null;
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+        mediaStreamRef.current = stream;
+
+        // Setup real-time visualizer
+        try {
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContextClass) {
+            const ctx = new AudioContextClass();
+            audioContextRef.current = ctx;
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 64;
+            const source = ctx.createMediaStreamSource(stream);
+            source.connect(analyser);
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const updateVolume = () => {
+              if (!audioContextRef.current || audioContextRef.current.state === 'closed') return;
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+              }
+              const avg = sum / dataArray.length;
+              setAudioVolume(Math.min(100, Math.round((avg / 128) * 100)));
+              animationFrameRef.current = requestAnimationFrame(updateVolume);
+            };
+            updateVolume();
+          }
+        } catch {}
+
+        // Setup MediaRecorder to record user's playback audio
+        try {
+          audioChunksRef.current = [];
+          const recorder = new MediaRecorder(stream);
+          mediaRecorderRef.current = recorder;
+          recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              audioChunksRef.current.push(e.data);
+            }
+          };
+          recorder.onstop = () => {
+            if (audioChunksRef.current.length > 0) {
+              const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+              setUserAudioUrl(URL.createObjectURL(audioBlob));
+            }
+          };
+          recorder.start();
+        } catch {}
+      }
+    } catch (err: any) {
+      setIsListening(false);
+      const errName = err?.name || '';
+      if (errName === 'NotAllowedError' || errName === 'PermissionDeniedError') {
+        setErrorType('not-allowed');
+        setMicPermissionError(
+          'Quyền truy cập Microphone đã bị chặn hoặc từ chối trên trình duyệt. Vui lòng bấm vào biểu tượng 🔒 hoặc ⚙️ bên trái thanh địa chỉ web để CHO PHÉP (Allow) Micro.'
+        );
+        setShowTroubleshooter(true);
+      } else if (errName === 'NotFoundError' || errName === 'DevicesNotFoundError') {
+        setErrorType('other');
+        setMicPermissionError(
+          'Không tìm thấy thiết bị Microphone trên máy tính hoặc điện thoại của bạn. Vui lòng cắm tai nghe có mic hoặc bật mic.'
+        );
+        setShowTroubleshooter(true);
+      } else {
+        setErrorType('other');
+        setMicPermissionError(
+          `Không thể kích hoạt micro (${err?.message || errName}). Bạn có thể thử cấp quyền lại hoặc dùng chế độ nhập từ bên dưới.`
+        );
+        setShowTroubleshooter(true);
+      }
+      return;
+    }
+
+    // Step B: Initialize SpeechRecognition
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setHasSpeechRecognition(false);
+      setErrorType('not-supported');
+      setIsListening(true);
       setMicPermissionError(
-        'Trình duyệt này chưa kích hoạt Web Speech Recognition. Bạn nên sử dụng Google Chrome, Edge hoặc Safari để có trải nghiệm tốt nhất.'
+        'Trình duyệt này (như Firefox hoặc trình duyệt nhúng) chưa hỗ trợ Web Speech API nhận diện giọng nói tự động. Bạn vẫn có thể ghi âm nghe lại hoặc chọn nhanh từ vừa phát âm để AI chấm điểm 10!'
       );
+      setShowManualInput(true);
       return;
     }
 
@@ -209,6 +352,7 @@ export function AiSpeakingCoach({
 
       recognition.onstart = () => {
         setIsListening(true);
+        setMicPermissionError(null);
       };
 
       recognition.onresult = (event: any) => {
@@ -223,73 +367,128 @@ export function AiSpeakingCoach({
           }
         }
 
+        const bestTranscript = final || interim;
+        latestTranscriptRef.current = bestTranscript;
+
         if (interim) {
           setInterimTranscript(interim);
         }
 
         if (final) {
           setFinalTranscript(final);
-          const confidence = event.results[0]?.[0]?.confidence || 0.9;
+          evaluatedRef.current = true;
+          const confidence = event.results[0]?.[0]?.confidence || 0.92;
           processEvaluation(currentItem.targetText, final, confidence);
         }
       };
 
       recognition.onerror = (event: any) => {
-        setIsListening(false);
-        if (event.error === 'not-allowed') {
+        const error = event.error;
+        console.warn('SpeechRecognition error:', error);
+
+        if (error === 'not-allowed') {
+          setErrorType('not-allowed');
           setMicPermissionError(
-            'Quyền truy cập Microphone đã bị từ chối. Hãy bấm vào biểu tượng Micro/Ổ khóa trên thanh địa chỉ của trình duyệt để cấp quyền nhé!'
+            'Quyền truy cập Microphone bị từ chối. Hãy bấm vào biểu tượng Ổ khóa 🔒 trên thanh địa chỉ của trình duyệt, chọn "Cho phép (Allow)" Micro rồi tải lại trang.'
           );
-        } else if (event.error === 'no-speech') {
-          setMicPermissionError('Chưa nhận được âm thanh. Hãy bấm nói lại to và rõ ràng hơn nhé!');
+          setShowTroubleshooter(true);
+        } else if (error === 'network') {
+          setErrorType('network');
+          setMicPermissionError(
+            'Lỗi kết nối tới máy chủ nhận diện giọng nói Google (Network error). Vui lòng kiểm tra mạng, tắt VPN hoặc tắt tiện ích chặn quảng cáo (AdBlock), hoặc dùng chức năng nhập từ để AI chấm điểm.'
+          );
+          setShowManualInput(true);
+        } else if (error === 'no-speech') {
+          setErrorType('no-speech');
+          setMicPermissionError(
+            'Micro chưa nhận được giọng nói. Bạn hãy nói to hơn, đưa micro lại gần khoảng 15-20cm và bấm nói lại nhé!'
+          );
+        } else if (error === 'audio-capture') {
+          setErrorType('other');
+          setMicPermissionError('Không thu được tín hiệu âm thanh từ Microphone của thiết bị.');
+          setShowTroubleshooter(true);
         } else {
-          setMicPermissionError(`Lỗi ghi âm (${event.error}). Vui lòng thử lại.`);
+          setMicPermissionError(`Lỗi nhận diện âm thanh (${error}). Vui lòng bấm thử lại.`);
         }
       };
 
       recognition.onend = () => {
         setIsListening(false);
+        setAudioVolume(0);
+
+        // Stop media recorder to finalize user audio playback
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          try {
+            mediaRecorderRef.current.stop();
+          } catch {}
+        }
+
+        // If recognition ended and final was not evaluated, but we have captured transcript
+        if (!evaluatedRef.current && latestTranscriptRef.current.trim().length > 0) {
+          evaluatedRef.current = true;
+          setFinalTranscript(latestTranscriptRef.current);
+          processEvaluation(currentItem.targetText, latestTranscriptRef.current, 0.88);
+        } else if (!evaluatedRef.current && !latestTranscriptRef.current) {
+          // If stopped without any words captured, suggest typing or checking mic
+          setShowManualInput(true);
+        }
       };
 
       recognition.start();
     } catch (err: any) {
       setIsListening(false);
+      setErrorType('other');
       setMicPermissionError(
-        'Không thể khởi động Microphone: ' + (err?.message || 'Vui lòng kiểm tra quyền truy cập.')
+        'Không thể khởi động Speech Recognition: ' + (err?.message || 'Vui lòng kiểm tra quyền micro.')
       );
+      setShowTroubleshooter(true);
     }
   };
 
   const stopListening = () => {
+    setIsListening(false);
+    setAudioVolume(0);
+
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
       } catch {}
-      setIsListening(false);
+    }
+
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+
+    // Process evaluation if we captured words
+    if (!evaluatedRef.current && latestTranscriptRef.current.trim().length > 0) {
+      evaluatedRef.current = true;
+      setFinalTranscript(latestTranscriptRef.current);
+      processEvaluation(currentItem.targetText, latestTranscriptRef.current, 0.88);
     }
   };
 
   // ── 3. CHẤM ĐIỂM THANG 10 & LƯU LỊCH SỬ ──
   const processEvaluation = (target: string, spoken: string, confidence: number = 0.92) => {
     setIsEvaluating(true);
+    setMicPermissionError(null);
 
     setTimeout(() => {
       const evalResult = evaluatePronunciation(target, spoken, confidence);
       setResult(evalResult);
       setIsEvaluating(false);
 
-      // Trigger Confetti on Excellent / High Score >= 8.5
       if (evalResult.score >= 8.5) {
         try {
           confetti({
-            particleCount: 65,
-            spread: 70,
+            particleCount: 70,
+            spread: 75,
             origin: { y: 0.6 },
           });
         } catch {}
       }
 
-      // Save to practice history
       const historyEntry: PracticeHistoryItem = {
         id: Date.now().toString(),
         targetText: target,
@@ -307,23 +506,98 @@ export function AiSpeakingCoach({
     }, 450);
   };
 
-  // ── 4. NHẬN XÉT CHUYÊN SÂU TỪ GEMINI AI ──
+  // ── 4. CHẤM ĐIỂM THỦ CÔNG KHI MICRO KHÔNG KHẢ DỤNG ──
+  const handleManualEvaluate = (textToEval: string) => {
+    const text = textToEval.trim();
+    if (!text) return;
+    setFinalTranscript(text);
+    processEvaluation(currentItem.targetText, text, 0.95);
+    setShowManualInput(false);
+  };
+
+  // ── 5. RUN DIAGNOSTIC TOOL ──
+  const runMicrophoneDiagnostic = async () => {
+    setDiagRunning(true);
+    setDiagResult(null);
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const hasSpeech = !!SpeechRecognition;
+
+    let hasMicHardware = false;
+    let volumeDetected = false;
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      hasMicHardware = true;
+
+      // Test audio level for 1.5 seconds
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyser = ctx.createAnalyser();
+      const src = ctx.createMediaStreamSource(stream);
+      src.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+
+      let count = 0;
+      const interval = setInterval(() => {
+        analyser.getByteFrequencyData(data);
+        const sum = data.reduce((a, b) => a + b, 0);
+        if (sum > 0) volumeDetected = true;
+        count++;
+        if (count > 10) {
+          clearInterval(interval);
+          stream.getTracks().forEach((t) => t.stop());
+          try {
+            ctx.close();
+          } catch {}
+
+          setDiagResult({
+            micAvailable: hasMicHardware,
+            speechApiAvailable: hasSpeech,
+            volumeDetected: true,
+            message:
+              hasMicHardware && hasSpeech
+                ? '✅ Microphone và dịch vụ nhận diện giọng nói đang hoạt động hoàn hảo! Bạn có thể bắt đầu luyện nói ngay.'
+                : hasMicHardware && !hasSpeech
+                ? '⚠️ Microphone hoạt động tốt, nhưng trình duyệt chưa hỗ trợ Web Speech API. Bạn nên mở bằng Google Chrome hoặc Microsoft Edge.'
+                : '❌ Cần kiểm tra lại quyền truy cập Microphone.',
+          });
+          setDiagRunning(false);
+        }
+      }, 100);
+    } catch (err: any) {
+      setDiagRunning(false);
+      setDiagResult({
+        micAvailable: false,
+        speechApiAvailable: hasSpeech,
+        volumeDetected: false,
+        message:
+          '❌ Quyền Microphone đang bị chặn: ' +
+          (err?.name === 'NotAllowedError'
+            ? 'Trình duyệt chưa được cấp quyền dùng Micro. Hãy bấm biểu tượng 🔒 trên thanh địa chỉ web để bật.'
+            : err?.message || 'Lỗi không xác định.'),
+      });
+      setShowTroubleshooter(true);
+    }
+  };
+
+  // ── 6. NHẬN XÉT CHUYÊN SÂU TỪ GEMINI AI ──
   const handleDeepGeminiAnalysis = async () => {
     if (!result) return;
     setIsLoadingGemini(true);
     setGeminiFeedback(null);
 
     try {
-      const prompt = `Bạn là Giám khảo chấm thi Speaking IELTS/THPT Quốc Gia 2027.
+      const prompt = `Bạn là Giám khảo chuyên gia chấm thi Speaking THPT Quốc Gia & IELTS.
 Học sinh vừa luyện phát âm:
-- Câu/từ mẫu chuẩn: "${result.expectedText}"
-- Học sinh vừa phát âm vào micro: "${result.transcript}"
-- Điểm thuật toán hiện tại: ${result.score}/10.0
+- Từ/câu mẫu chuẩn: "${result.expectedText}"
+- Học sinh vừa phát âm: "${result.transcript}"
+- Điểm thuật toán chấm hiện tại: ${result.score}/10.0
 
-Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc tích, thân thiện, truyền cảm hứng):
-1. Nhận xét về độ chính xác và độ chuẩn của âm tiết
-2. Chỉ ra chính xác âm nào người Việt hay phát âm sai trong câu này (ví dụ âm đuôi, trọng âm, nguyên âm đôi)
-3. Hướng dẫn khẩu hình miệng và cách luyện tập để đạt điểm 10 tuyệt đối.`;
+Hãy đưa ra nhận xét ngắn gọn và thiết thực (3-4 gạch đầu dòng xúc tích, thân thiện):
+1. Đánh giá độ chính xác của phụ âm và nguyên âm
+2. Chỉ ra lỗi âm đuôi (như /s/, /z/, /ed/, /t/, /d/) hoặc lỗi trọng âm người Việt hay mắc phải
+3. Hướng dẫn khẩu hình miệng và cách phát âm để đạt điểm 10 tuyệt đối.`;
 
       const res = await fetch('/api/ai-tutor', {
         method: 'POST',
@@ -402,7 +676,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
 
       {/* ── MAIN STUDIO WORKSPACE ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: TOPIC SELECTION & PRESETS (4 COLS) */}
+        {/* LEFT COLUMN: TOPIC SELECTION & PRESETS (5 COLS) */}
         <div className="lg:col-span-5 space-y-4">
           <Card className="border-slate-200 shadow-md">
             <CardHeader className="pb-3 border-b border-slate-100">
@@ -423,7 +697,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
               <div className="flex flex-wrap gap-1.5 pt-2">
                 <button
                   onClick={() => setCategoryFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     categoryFilter === 'all'
                       ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -433,7 +707,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                 </button>
                 <button
                   onClick={() => setCategoryFilter('vocab_stress')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     categoryFilter === 'vocab_stress'
                       ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -443,7 +717,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                 </button>
                 <button
                   onClick={() => setCategoryFilter('ending_sounds')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     categoryFilter === 'ending_sounds'
                       ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -453,7 +727,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                 </button>
                 <button
                   onClick={() => setCategoryFilter('collocation')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     categoryFilter === 'collocation'
                       ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -463,13 +737,13 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                 </button>
                 <button
                   onClick={() => setCategoryFilter('sentence_structure')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     categoryFilter === 'sentence_structure'
                       ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Cấu trúc câu 8+
+                  Cấu trúc 8+
                 </button>
               </div>
             </CardHeader>
@@ -537,6 +811,71 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
             </CardContent>
           </Card>
 
+          {/* MICROPHONE DIAGNOSTICS & HELP WIDGET */}
+          <Card className="border-indigo-100 bg-gradient-to-br from-indigo-50/40 via-white to-purple-50/30 shadow-xs">
+            <CardHeader className="py-3 px-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xs font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                  <Settings2 className="w-4 h-4 text-indigo-600" />
+                  Công Cụ Kiểm Tra Micro
+                </CardTitle>
+                <button
+                  onClick={() => setShowTroubleshooter(!showTroubleshooter)}
+                  className="text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
+                >
+                  {showTroubleshooter ? 'Đóng hướng dẫn' : 'Cách sửa lỗi mic'}
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 pt-0 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  onClick={runMicrophoneDiagnostic}
+                  disabled={diagRunning}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs font-bold border-indigo-200 text-indigo-700 hover:bg-indigo-50 w-full justify-center gap-1.5 cursor-pointer"
+                >
+                  <Radio className={`w-3.5 h-3.5 ${diagRunning ? 'animate-pulse text-rose-500' : ''}`} />
+                  <span>{diagRunning ? 'Đang test micro...' : 'Kiểm Tra Tín Hiệu Micro'}</span>
+                </Button>
+              </div>
+
+              {diagResult && (
+                <div
+                  className={`p-3 rounded-xl text-xs font-medium border leading-relaxed ${
+                    diagResult.micAvailable
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border-rose-200 text-rose-900'
+                  }`}
+                >
+                  {diagResult.message}
+                </div>
+              )}
+
+              {/* STEP BY STEP TROUBLESHOOTING GUIDE */}
+              {showTroubleshooter && (
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2.5 text-xs text-slate-700 animate-fade-in">
+                  <div className="font-black text-slate-900 flex items-center gap-1.5">
+                    <ShieldAlert className="w-4 h-4 text-amber-500" />
+                    <span>3 Bước Khắc Phục Lỗi Không Bật Được Micro:</span>
+                  </div>
+                  <ol className="list-decimal pl-4 space-y-1.5 leading-relaxed font-medium">
+                    <li>
+                      <strong>Cấp quyền trên trình duyệt:</strong> Nhìn lên thanh địa chỉ web, bấm vào biểu tượng <strong>Ổ khóa 🔒</strong> hoặc <strong>Cài đặt trang web</strong> cạnh link <code>ktpl12c1.vercel.app</code> ➔ Đổi <strong>Microphone</strong> thành <strong>Cho phép (Allow)</strong> ➔ Bấm <strong>Tải lại trang (F5)</strong>.
+                    </li>
+                    <li>
+                      <strong>Cài đặt quyền Windows 10/11:</strong> Mở <em>Start Menu ➔ Settings (Cài đặt) ➔ Privacy & security (Quyền riêng tư) ➔ Microphone ➔ Bật "Microphone access"</em> và bật <em>"Let desktop apps access your microphone"</em>.
+                    </li>
+                    <li>
+                      <strong>Trình duyệt tối ưu:</strong> Hãy mở trang web bằng <strong>Google Chrome</strong> hoặc <strong>Microsoft Edge</strong> để có chất lượng nhận diện giọng nói chuẩn xác nhất.
+                    </li>
+                  </ol>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* RECENT ATTEMPTS WIDGET */}
           {history.length > 0 && (
             <Card className="border-slate-200 shadow-xs">
@@ -550,7 +889,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                     setHistory([]);
                     localStorage.removeItem('eh_speaking_history');
                   }}
-                  className="text-[11px] text-slate-400 hover:text-rose-600 font-bold"
+                  className="text-[11px] text-slate-400 hover:text-rose-600 font-bold cursor-pointer"
                 >
                   Xóa
                 </button>
@@ -692,7 +1031,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                   {isAiSpeaking && (
                     <button
                       onClick={stopAiSpeaking}
-                      className="px-3 py-3 rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold text-xs"
+                      className="px-3 py-3 rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold text-xs cursor-pointer"
                       title="Dừng phát âm"
                     >
                       <VolumeX className="w-4 h-4" />
@@ -744,13 +1083,32 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                   </button>
                 </div>
 
+                {/* Live Audio Equalizer Bars when listening */}
+                {isListening && (
+                  <div className="flex items-center justify-center gap-1.5 h-8">
+                    {[30, 60, 90, 45, 80, 50, 75].map((baseHeight, i) => {
+                      const dynamicHeight = Math.max(
+                        10,
+                        Math.round((baseHeight * (audioVolume + 15)) / 100)
+                      );
+                      return (
+                        <div
+                          key={i}
+                          style={{ height: `${dynamicHeight}px` }}
+                          className="w-1.5 bg-gradient-to-t from-rose-500 to-purple-600 rounded-full transition-all duration-75"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+
                 {/* Status Indicator */}
                 <div>
                   {isListening ? (
                     <div className="space-y-2">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-bold animate-pulse">
                         <span className="w-2 h-2 rounded-full bg-rose-600" />
-                        <span>AI đang nghe bạn nói... Hãy phát âm to và rõ ràng nhé!</span>
+                        <span>AI đang nghe bạn phát âm... Hãy nói to và rõ ràng nhé!</span>
                       </div>
                       {interimTranscript && (
                         <div className="text-sm font-semibold text-slate-700 italic">
@@ -765,18 +1123,117 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                     </div>
                   ) : (
                     <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                      Nhấp vào micro, chờ tín hiệu và phát âm từ/câu trên. AI sẽ tự động lắng nghe và chấm điểm.
+                      Nhấp vào micro, cấp quyền cho trình duyệt và phát âm từ/câu trên. AI sẽ tự động lắng nghe và chấm điểm.
                     </p>
                   )}
                 </div>
 
-                {/* Error Banner if any */}
+                {/* Playback recorded user audio */}
+                {userAudioUrl && !isListening && (
+                  <div className="p-3 rounded-xl bg-white border border-slate-200 inline-flex items-center gap-3 text-xs font-bold text-slate-700 shadow-xs">
+                    <span>🎙️ Nghe lại bản thu âm của bạn:</span>
+                    <audio src={userAudioUrl} controls className="h-8 max-w-[220px]" />
+                  </div>
+                )}
+
+                {/* Error Banner with 1-click troubleshooting */}
                 {micPermissionError && (
-                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs text-left flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
-                    <div className="space-y-1">
-                      <div className="font-bold">Lưu ý microphone:</div>
-                      <div>{micPermissionError}</div>
+                  <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs text-left space-y-2 animate-fade-in">
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                      <div className="space-y-1 flex-1">
+                        <div className="font-bold text-rose-800">Thông báo về Microphone:</div>
+                        <div className="leading-relaxed">{micPermissionError}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-rose-200/60">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowTroubleshooter(true)}
+                        className="text-xs font-bold bg-white text-rose-700 border-rose-300 hover:bg-rose-100 cursor-pointer"
+                      >
+                        <Settings2 className="w-3.5 h-3.5 mr-1" />
+                        Xem hướng dẫn mở Micro
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowManualInput(true)}
+                        className="text-xs font-bold bg-white text-indigo-700 border-indigo-300 hover:bg-indigo-50 cursor-pointer"
+                      >
+                        <FileEdit className="w-3.5 h-3.5 mr-1" />
+                        Nhập từ để chấm điểm
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={startListening}
+                        className="text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 cursor-pointer"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                        Thử lại
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* MANUAL TEXT / SIMULATION FALLBACK */}
+                {(showManualInput || !hasSpeechRecognition) && (
+                  <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 text-left space-y-3 animate-fade-in">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase text-indigo-900 flex items-center gap-1.5">
+                        <FileEdit className="w-4 h-4 text-indigo-600" />
+                        Chế Độ Kiểm Tra Phát Âm (Dự Phòng Khi Mic Bị Lỗi)
+                      </span>
+                      <button
+                        onClick={() => setShowManualInput(false)}
+                        className="text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
+                      >
+                        ✕ Đóng
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-indigo-950 font-medium">
+                      Nếu micro máy tính bị hỏng hoặc chưa cấp quyền, bạn có thể nhập lại từ bạn vừa nói hoặc bấm chọn nhanh bên dưới để xem AI chấm điểm:
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={manualSpokenText}
+                        onChange={(e) => setManualSpokenText(e.target.value)}
+                        placeholder={`Nhập cách bạn đọc, ví dụ: ${currentItem.targetText.toLowerCase()}...`}
+                        className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-indigo-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleManualEvaluate(manualSpokenText || currentItem.targetText)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer"
+                      >
+                        Chấm Điểm
+                      </Button>
+                    </div>
+
+                    {/* Quick test chips */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                      <span className="text-slate-500 font-bold text-[11px]">Thử nghiệm:</span>
+                      <button
+                        onClick={() => handleManualEvaluate(currentItem.targetText)}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-[11px] transition-colors cursor-pointer"
+                      >
+                        🎯 Đọc chuẩn 100% ({currentItem.targetText})
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleManualEvaluate(
+                            currentItem.targetText.slice(0, -1) // drop ending sound
+                          )
+                        }
+                        className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] transition-colors cursor-pointer"
+                      >
+                        ⚠️ Thiếu âm đuôi ({currentItem.targetText.slice(0, -1)})
+                      </button>
                     </div>
                   </div>
                 )}
@@ -821,7 +1278,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                       <Button
                         onClick={startListening}
                         size="sm"
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1.5"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1.5 cursor-pointer"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Nói Lại</span>
@@ -831,7 +1288,7 @@ Hãy đưa ra nhận xét ngắn gọn (khoảng 3-4 gạch đầu dòng xúc t�
                         disabled={isLoadingGemini}
                         variant="outline"
                         size="sm"
-                        className="border-purple-300 text-purple-700 hover:bg-purple-50 font-bold gap-1.5"
+                        className="border-purple-300 text-purple-700 hover:bg-purple-50 font-bold gap-1.5 cursor-pointer"
                       >
                         <Bot className="w-3.5 h-3.5" />
                         <span>{isLoadingGemini ? 'Đang hỏi AI...' : 'AI Nhận Xét'}</span>
