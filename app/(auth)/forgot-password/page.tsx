@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
             <BookOpen className="w-5 h-5" />
           </div>
           <span className="font-extrabold text-2xl tracking-tight text-slate-900">
-            ENGLISH<span className="text-indigo-600"> HUB</span>
+            ENG<span className="text-indigo-600">VERSE</span>
           </span>
         </Link>
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">

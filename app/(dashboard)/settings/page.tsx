@@ -204,7 +204,7 @@ export default function SettingsPage() {
               </label>
               <Input
                 type="email"
-                value={user?.email || 'student@englishhub.edu.vn'}
+                value={user?.email || 'student@engverse.edu.vn'}
                 disabled
                 icon={<Mail className="w-4 h-4" />}
                 className="bg-slate-50 text-slate-500 cursor-not-allowed"

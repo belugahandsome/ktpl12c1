@@ -12,7 +12,7 @@ import { isSupabaseConfigured, createClient } from './client';
 
 export const DEMO_USER_PROFILE: UserProfile = {
   id: 'demo-student-id',
-  email: 'student@englishhub.edu.vn',
+  email: 'student@engverse.edu.vn',
   display_name: 'Nguyễn Văn Minh',
   avatar_url: '',
   target_score: 8.5,

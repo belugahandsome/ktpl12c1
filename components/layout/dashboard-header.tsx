@@ -83,18 +83,18 @@ export function DashboardHeader({ onOpenMobileMenu }: DashboardHeaderProps) {
           <span>Mục tiêu: {user?.target_score ? user.target_score.toFixed(1) : '8.0'}đ</span>
         </div>
 
-        {/* LOGO ENGLISH HUB (GÓC PHẢI) - BẤM ĐỂ CHUYỂN VỀ TRANG CHỦ */}
+        {/* LOGO ENGVERSE (GÓC PHẢI) - BẤM ĐỂ CHUYỂN VỀ TRANG CHỦ */}
         <Link
           href="/"
           className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/90 text-slate-800 transition-all card-hover shadow-xs group"
-          title="Bấm vào logo ENGLISH HUB để chuyển về Trang Chủ ban đầu"
+          title="Bấm vào logo EngVerse để chuyển về Trang Chủ ban đầu"
         >
           <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
             <BookOpen className="w-5 h-5" />
           </div>
           <div className="hidden sm:flex flex-col text-left">
             <span className="font-black text-sm tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors leading-none">
-              ENGLISH<span className="text-indigo-600"> HUB</span>
+              ENG<span className="text-indigo-600">VERSE</span>
             </span>
             <span className="text-[10px] text-slate-500 font-bold tracking-tight mt-0.5">
               {user?.id === 'demo-student-id' ? 'Về Trang Chủ' : 'Trang Chủ'}

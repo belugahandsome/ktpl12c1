@@ -110,7 +110,7 @@ const TESTIMONIALS = [
     name: 'Nguyễn Thị Lan',
     school: 'THPT Chuyên Hà Nội – Amsterdam',
     score: '9.2',
-    text: 'Nhờ ENGLISH HUB mình ôn được đúng trọng tâm. Điểm thi thử tăng từ 7.0 lên 9.2 chỉ trong 2 tháng ôn luyện!',
+    text: 'Nhờ EngVerse mình ôn được đúng trọng tâm. Điểm thi thử tăng từ 7.0 lên 9.2 chỉ trong 2 tháng ôn luyện!',
     avatar: 'L',
     color: 'bg-indigo-500',
   },
@@ -394,7 +394,7 @@ export default function LandingPage() {
               Đánh giá thực tế từ học sinh
             </div>
             <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-              Sĩ tử nói gì về <span className="gradient-text">ENGLISH HUB?</span>
+              Sĩ tử nói gì về <span className="gradient-text">EngVerse?</span>
             </h2>
           </div>
 

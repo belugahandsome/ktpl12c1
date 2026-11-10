@@ -43,7 +43,7 @@ export function AiTutorWidget() {
       id: 'welcome-msg',
       role: 'assistant',
       content:
-        '👋 Chào bạn! Mình là **Gia Sư AI Tiếng Anh** của ENGLISH HUB.\n\nBạn có thể hỏi mình bất cứ câu hỏi nào về **ngữ pháp, từ vựng, giải thích câu hỏi đề thi THPT 2027**, hoặc nhờ mình chấm bài viết tiếng Anh nhé!',
+        '👋 Chào bạn! Mình là **Gia Sư AI Tiếng Anh** của EngVerse.\n\nBạn có thể hỏi mình bất cứ câu hỏi nào về **ngữ pháp, từ vựng, giải thích câu hỏi đề thi THPT 2027**, hoặc nhờ mình chấm bài viết tiếng Anh nhé!',
       timestamp: 'Vừa xong',
     },
   ]);

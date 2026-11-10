@@ -34,7 +34,9 @@ function LoginForm() {
     // Auto-detect demo account login to prevent failed Supabase request
     const cleanEmail = email.toLowerCase().trim();
     if (
+      cleanEmail === 'student@engverse.edu.vn' ||
       cleanEmail === 'student@englishhub.edu.vn' ||
+      cleanEmail === 'demo@engverse.edu.vn' ||
       cleanEmail === 'demo@englishhub.edu.vn' ||
       cleanEmail === 'demo'
     ) {
@@ -112,7 +114,7 @@ function LoginForm() {
 
     const demoUser: UserProfile = {
       id: 'demo-student-id',
-      email: 'student@englishhub.edu.vn',
+      email: 'student@engverse.edu.vn',
       display_name: 'Nguyễn Văn Minh',
       target_score: 8.5,
       school: 'THPT Chuyên Hà Nội - Amsterdam',
@@ -242,7 +244,7 @@ export default function LoginPage() {
             <BookOpen className="w-5 h-5" />
           </div>
           <span className="font-extrabold text-2xl tracking-tight text-slate-900">
-            ENGLISH<span className="text-indigo-600"> HUB</span>
+            ENG<span className="text-indigo-600">VERSE</span>
           </span>
         </Link>
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">

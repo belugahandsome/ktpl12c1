@@ -138,7 +138,7 @@ export function Sidebar({
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-extrabold text-lg tracking-tight text-slate-900 leading-none">
-                ENGLISH<span className="text-indigo-600"> HUB</span>
+                ENG<span className="text-indigo-600">VERSE</span>
               </span>
               <span className="text-[10px] text-slate-400 font-semibold tracking-wide uppercase mt-1">
                 Ôn Thi THPT

@@ -43,7 +43,7 @@ export function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="font-black text-2xl tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
-                ENGLISH<span className="text-indigo-600"> HUB</span>
+                ENG<span className="text-indigo-600">VERSE</span>
               </span>
               <span className="text-xs text-slate-400 font-bold tracking-wider -mt-1 uppercase">
                 Luyện Thi THPT Quốc Gia

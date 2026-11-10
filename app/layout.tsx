@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ENGLISH HUB - Nền tảng Học Tiếng Anh & Luyện Thi Tốt Nghiệp THPT 2027',
+  title: 'EngVerse - Nền tảng Học Tiếng Anh & Luyện Thi Tốt Nghiệp THPT 2027',
   description: 'Nền tảng học tiếng anh hiện đại dành cho học sinh Việt Nam. Luyện từ vựng, ngữ pháp, cấu trúc câu và đề thi thử tốt nghiệp THPT Quốc Gia với đáp án và giải thích chi tiết cùng Gia Sư AI 24/7.',
   keywords: [
     'học tiếng anh',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     'từ vựng tiếng anh',
     'đề thi thử tiếng anh thpt',
     'gia sư ai tiếng anh',
-    'english hub'
+    'engverse'
   ],
 };
 
